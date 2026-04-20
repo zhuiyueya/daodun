@@ -3,7 +3,8 @@ import { render, screen } from '@testing-library/react'
 import App from './App'
 
 describe('App', () => {
-  it('renders the event title and deadline', () => {
+  it('renders the home page by default', () => {
+    window.location.hash = '#/'
     render(<App />)
 
     expect(
@@ -22,13 +23,45 @@ describe('App', () => {
     expect(
       screen.getByRole('heading', { name: '咋评的？', level: 2 }),
     ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '作品广场' })).toBeInTheDocument()
   })
 
-  it('links the registration buttons to the Feishu form', () => {
+  it('renders the gallery page from hash route', () => {
+    window.location.hash = '#/gallery'
+    render(<App />)
+
+    expect(screen.getByRole('tablist', { name: '作品赛道筛选' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '全部' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '落地作品' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: '纯想法' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '返回首页' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '登录' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '提交作品' })).toBeInTheDocument()
+    expect(screen.getByText('找你妹（嘉豪版）')).toBeInTheDocument()
+    expect(screen.getByAltText('找你妹（嘉豪版） 封面图')).toBeInTheDocument()
+  })
+
+  it('renders the work detail page from hash route', () => {
+    window.location.hash = '#/work/work-1'
+    render(<App />)
+
+    expect(
+      screen.getByRole('heading', { name: '找你妹（嘉豪版）', level: 1 }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '返回作品广场' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: '当前提交内容', level: 2 }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('嘉豪宇宙工作室')).toBeInTheDocument()
+    expect(screen.getByAltText('找你妹（嘉豪版） 展示图')).toBeInTheDocument()
+  })
+
+  it('links the registration button to the Feishu form', () => {
+    window.location.hash = '#/'
     render(<App />)
 
     const registerLinks = screen.getAllByRole('link', {
-      name: /立即报名|前往报名表单/,
+      name: /立即报名/,
     })
 
     for (const link of registerLinks) {
