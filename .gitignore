@@ -27,3 +27,6 @@ dist-ssr
 .DS_Store
 .wrangler/
 jiahao-test/
+
+.wrangler/
+jiahao-test/
