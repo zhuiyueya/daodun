@@ -1,3 +1,8 @@
 name = "daodun-cup-site"
 compatibility_date = "2026-04-18"
 pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "daodun-cup-db"
+database_id = "b1fca4f5-f4a4-40ec-8e18-64a8090af39a"

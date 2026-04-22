@@ -45,6 +45,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.02);
   color: var(--heading);
+  text-decoration: none;
   cursor: pointer;
   transition:
     transform 180ms ease,
@@ -464,7 +465,9 @@
 }
 
 .work-card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 14px;
   padding: 22px;
   border: 1px solid var(--border);
@@ -523,7 +526,9 @@
 }
 
 .card-button {
-  justify-self: start;
+  margin-top: auto;
+  width: fit-content;
+  text-decoration: none;
 }
 
 .detail-page {
@@ -659,6 +664,156 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+.form-page {
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+}
+
+.form-card {
+  width: min(100%, 760px);
+}
+
+.form-page .detail-toolbar {
+  width: min(100%, 760px);
+}
+
+.form-copy,
+.meta-text,
+.helper-text,
+.reject-copy,
+.field small {
+  color: var(--muted);
+}
+
+.field-counter {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.field-counter.over {
+  color: #ff8d8d;
+}
+
+.field {
+  display: grid;
+  gap: 10px;
+}
+
+.field span {
+  color: var(--heading);
+  font-size: 0.95rem;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--heading);
+}
+
+.field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.field input[type='file'] {
+  padding: 10px;
+}
+
+.upload-field {
+  gap: 12px;
+  padding: 16px;
+  border: 1px dashed rgba(76, 255, 153, 0.26);
+  border-radius: 18px;
+  background: rgba(10, 18, 14, 0.72);
+}
+
+.hidden-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.upload-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  width: fit-content;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(76, 255, 153, 0.4);
+  background: rgba(76, 255, 153, 0.14);
+  color: var(--heading);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.upload-trigger:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  background: rgba(76, 255, 153, 0.2);
+}
+
+.upload-trigger:focus-visible {
+  outline: 2px solid rgba(76, 255, 153, 0.7);
+  outline-offset: 2px;
+}
+
+.upload-field small {
+  line-height: 1.5;
+}
+
+.inline-choice,
+.form-actions,
+.card-actions,
+.card-topline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.status-badge.pending {
+  color: #ffe19a;
+  background: rgba(255, 196, 76, 0.08);
+}
+
+.status-badge.approved {
+  color: #04110a;
+  background: var(--accent);
+}
+
+.status-badge.rejected {
+  color: #ffb8b8;
+  background: rgba(255, 76, 76, 0.1);
+}
+
 .prize-card {
   display: grid;
   gap: 16px;
@@ -731,6 +886,14 @@
   .detail-link-row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .inline-choice,
+  .form-actions,
+  .card-actions,
+  .card-topline {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .hero-grid {
