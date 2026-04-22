@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react'
 
 import './App.css'
-import heroPreview from './assets/hero.png'
 import prizePreview from './assets/5FC9B1BF14E3034F2CD2E29B48605F13.jpg'
-import sitePreview from './assets/1776507499326.jpg'
 import groupQrCode from './assets/qrcode.jpg'
+import classSkipperCover from './assets/taokemoniqi/d5fce296660ee7b23435c13845e5d9e0.png'
+import classSkipperShot1 from './assets/taokemoniqi/7fd52f3db8bd5a4fb5b89f3904234ed8.png'
+import classSkipperShot2 from './assets/taokemoniqi/ae4d243fd2bdd58b8de58778e4d53a55.png'
+import jiahaoCover from './assets/jiahaoTI/08cb2901168867e34c1175d07059bad1.png'
+import jiahaoShot from './assets/jiahaoTI/c4c46ffb34b0d596df2047a9fd72e18a.png'
+import dahunzhanCover from './assets/dahunzhan/547220cbe4244041e1d435ee97695185.png'
+import dahunzhanImage from './assets/dahunzhan/6BB3AB439C86A8F9D183E4966B4363F4.jpg'
 
 const registrationUrl =
   'https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd'
 
-const deadline = new Date('2026-04-26T00:00:00+08:00')
+const deadline = new Date('2026-05-07T00:00:00+08:00')
 
 const highlights = [
   '只要是你想实现的、好玩有趣，沾点 AI / 编程，都能来参赛~',
@@ -19,34 +24,35 @@ const highlights = [
 
 const tracks = [
   {
-    title: 'Vibe Coding 赛道',
+    title: '落地赛道',
     description:
-      '你可以提交一个可访问的网站、Demo 或其他成品；如果暂时没上线，也可以提交视频和截图。',
+      '你可以提交一个可访问的网站、AI 生成视频、Demo 或其他成品；如果暂时没上线，也可以提交截图。（如果是视频，需要发在抖音、B 站等平台上，发布时带上 #刀盾杯 标签，并提交作品链接）',
   },
   {
     title: '纯想法赛道',
     description:
-      '适合脑洞先行的人。可以用文字、图片、视频等方式，把你的想法讲清楚。',
+      '适合脑洞先行的人。可以用文字、图片等方式，把你的想法讲清楚。',
   },
 ]
 
 const submissionFormats = [
   '可直接访问的网站',
-  '小游戏 / 小工具 / Demo',
-  '作品截图/视频',
+  '小程序名 / APP 名',
+  '作品截图',
+  'AI 生成视频链接',
   '纯文字描述',
 ]
 
 const examples = {
   made: [
     '找你妹（嘉豪版）小游戏',
-    '刀盾大战奶龙 AI 视频',
     '嘉豪测试网站：测你是不是嘉豪',
     '一个离谱但真的能用的课表软件',
+    '刀盾大战奶龙 AI 生成视频'
   ],
   idea: [
     '我的想法是可以做一个带薪拉屎模拟器，这样我每天就能知道自己拉屎的时候赚了多了钱了，毕竟摸鱼来的才是赚的',
-    '感觉能做一个蓝宝红宝紫宝大混战',
+    '感觉能做一个蓝宝红宝紫宝大混战游戏',
     '可以做一个可以做（bushi）',
   ],
 }
@@ -59,16 +65,37 @@ const galleryFilters = [
 
 const works = [
   {
-    id: 'work-1',
+    id: 'work-0',
     track: 'landing',
+    title: '校园逃课模拟器，踩线混到刚刚好。',
+    summary: '一个把“逃课踩点”做成网页体验的模拟器，主打在边缘反复横跳。',
+    media: ['网站', '截图'],
+    status: '可直接访问',
+    author: '䑟譱',
+    cover: classSkipperCover,
+    website: 'https://lithiumcitrate.github.io/Class-Skipper-Simulator/',
+    description: '校园逃课模拟器，踩线混到刚刚好。',
+    deliverables: [
+      '可直接访问的网站链接',
+      '作品封面图 1 张',
+      '玩法截图 2 张',
+      '文字说明与模拟设定',
+    ],
+    assets: [
+      { type: 'image', src: classSkipperShot1 },
+      { type: 'image', src: classSkipperShot2 },
+    ],
+  },
+  {
+    id: 'work-1',
+    track: 'idea',
     title: '找你妹（嘉豪版）',
     summary: '一个一边找茬一边怀疑自己是不是嘉豪的离谱小游戏。',
     media: ['网站', '截图'],
     status: '可直接访问',
     author: '嘉豪宇宙工作室',
-    cover: sitePreview,
     description:
-      '这是一个把“找你妹”玩法和嘉豪梗强行缝合在一起的网页版小游戏。玩家需要在满屏抽象素材里迅速找出唯一合理答案，越玩越怀疑自己。',
+      '把找你妹和嘉豪梗强行缝合在一起做网页版小游戏。玩家需要在满屏抽象素材里迅速找出唯一合理答案',
     deliverables: [
       '可直接访问的网站链接',
       '3 张关键界面截图',
@@ -78,35 +105,41 @@ const works = [
   {
     id: 'work-2',
     track: 'landing',
-    title: '刀盾大战奶龙 AI 视频',
-    summary: '使用 AI 生成的一段刀盾宇宙热血短片，主打气势和抽象感并存。',
+    title: '咕咕嘎嘎,刘强卖瓜,刀盾,哈基米大混战',
+    summary: '豆包理解的...,这啥啊',
     media: ['视频', '截图'],
     status: '视频作品',
-    author: '奶龙对抗协会',
-    cover: heroPreview,
-    description:
-      '一支用 AI 生成工具拼出来的热血大战短片，内容包括刀盾军团、奶龙怒吼、史诗旁白和意义不明的终局对视。',
+    author: '刀盾',
+    cover: dahunzhanCover,
+    website:
+      '6.97 复制打开抖音，看看【名字30天内已修改0次的作品】豆包理解的咕咕嘎嘎和刀盾，哈基米… 太抽象了 br... https://v.douyin.com/UNaqpqQ4jYA/ S@y.Ty xfo:/ 04/06',
+    description: '豆包理解的...,这啥啊',
     deliverables: [
       '1080p 视频成片',
       '视频分镜截图',
       'AI 提示词与制作说明',
     ],
+    assets: [{ type: 'image', src: dahunzhanImage }],
   },
   {
     id: 'work-3',
     track: 'landing',
-    title: '嘉豪测试网站',
-    summary: '回答几个不正经的问题，测试你到底是不是嘉豪系人格。',
-    media: ['网站', '文字'],
-    status: '交互作品',
-    author: '刀盾人格研究中心',
-    cover: sitePreview,
-    description:
-      '一个抽象人格测试站，通过一系列离谱问题给用户打上嘉豪系标签，最后输出极具侮辱性但又很精准的结果页。',
+    title: '嘉豪指数测试',
+    summary: '是不是嘉豪一测就知',
+    media: ['网站', '截图'],
+    status: '可直接访问',
+    author: '匿名',
+    cover: jiahaoCover,
+    website: 'https://jiahaoti.pages.dev/',
+    description: '是不是嘉豪一测就知',
     deliverables: [
       '交互网页链接',
       '结果页截图',
       '题库与判定逻辑说明',
+    ],
+    assets: [
+      { type: 'image', src: jiahaoCover },
+      { type: 'image', src: jiahaoShot },
     ],
   },
   {
@@ -117,23 +150,9 @@ const works = [
     media: ['文字', '配图'],
     status: '纯想法',
     author: '厕所经济学派',
-    cover: prizePreview,
     description:
-      '一个围绕“摸鱼收益最大化”构建的模拟器设想。玩家需要在时机、路线、姿态和老板巡逻概率之间找到最优解。',
+      '统计自己在上班期间拉了多少次屎，每次拉屎的时间是多少，然后按每日的工资来计算出自己今天赚了多少钱，毕竟摸来的才是赚到的。',
     deliverables: ['核心玩法说明文档', '2 张概念配图', '奖励与失败机制设想'],
-  },
-  {
-    id: 'work-5',
-    track: 'idea',
-    title: '蓝宝红宝紫宝大混战',
-    summary: '一个完全不讲道理但拥有完整世界观的多宝石阵营大战设定。',
-    media: ['文字'],
-    status: '世界观脑洞',
-    author: '宝石战争项目组',
-    cover: heroPreview,
-    description:
-      '这是一个多阵营对抗世界观，每种宝石都有独特口癖、战斗姿态和价值观冲突，剧情严肃程度和角色设计抽象程度成反比。',
-    deliverables: ['世界观设定文档', '角色阵营草案', '故事推进路线'],
   },
   {
     id: 'work-6',
@@ -143,7 +162,6 @@ const works = [
     media: ['文字', '配图'],
     status: '概念作品',
     author: '早八受害者联盟',
-    cover: prizePreview,
     description:
       '它表面是一个课表助手，实际上是一个情绪陪伴精灵，会在你看到连堂和早八时先替你骂出声，再给出可爱但无用的安慰。',
     deliverables: ['产品概念说明', '交互流程草图', '情绪语音脚本片段'],
@@ -176,6 +194,20 @@ function getTimeLeft(now: number) {
     minutes: Math.floor((diff / (1000 * 60)) % 60),
     seconds: Math.floor((diff / 1000) % 60),
   }
+}
+
+function getGalleryDescription(text: string, maxLength = 56) {
+  if (text.length <= maxLength) {
+    return text
+  }
+
+  return `${text.slice(0, maxLength).trim()}...`
+}
+
+function getExternalHref(text: string) {
+  const matchedUrl = text.match(/https?:\/\/\S+/)
+
+  return matchedUrl?.[0] ?? text
 }
 
 function App() {
@@ -224,6 +256,15 @@ function App() {
 
   const showComingSoonNotice = (feature: string) => {
     setNotice(`${feature}将在比赛正式开始后开放，先来看看作品广场和比赛说明。`)
+  }
+
+  const copyText = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      setNotice('链接已复制')
+    } catch {
+      setNotice('复制失败，请手动复制')
+    }
   }
 
   const detailWork = works.find((work) => work.id === currentPage.workId) ?? null
@@ -301,7 +342,7 @@ function App() {
             </div>
             <div className="info-card">
               <p>
-                这是一个面向大学生的赛博整活大赛。你可以把各种想法做成网页、小游戏、AI 视频，或者只是一个好玩的想法。
+                这是一个面向大学生的赛博整活大赛。你可以把各种想法做成网页、小游戏、应用、小程序、AI 生成视频等，或者只是一个好玩的想法。
               </p>
             </div>
           </section>
@@ -338,7 +379,7 @@ function App() {
           <section className="examples-section" aria-labelledby="examples-title">
             <div className="section-heading">
               <p className="eyebrow">灵感参考</p>
-              <h2 id="examples-title">举几个例子</h2>
+              <h2 id="examples-title">举几个🌰</h2>
             </div>
             <div className="examples-grid">
               <article className="example-card">
@@ -374,10 +415,16 @@ function App() {
           <section className="prizes-section" aria-labelledby="prizes-title">
             <div className="section-heading">
               <p className="eyebrow">奖品</p>
-              <h2 id="prizes-title">部分奖品预览</h2>
+              <h2 id="prizes-title">奖金设置与部分奖品参考</h2>
             </div>
             <div className="prize-card">
-              <img className="prize-image" src={prizePreview} alt="刀盾杯部分奖品预览" />
+              <div className="prize-copy">
+                <p>落地赛道：500 元 × 1，300 元 × 1，100 元 × 4</p>
+                <p>纯想法赛道：50 元 × 1，30 元 × 2，10 元 × 4</p>
+                <p>两个赛道均额外加 10 个抽象玩偶</p>
+                <p>下图为部分抽象玩偶参考</p>
+              </div>
+              <img className="prize-image" src={prizePreview} alt="刀盾杯部分抽象玩偶参考" />
             </div>
           </section>
         </>
@@ -423,22 +470,11 @@ function App() {
           <div className="works-grid">
             {filteredWorks.map((work) => (
               <article className="work-card" key={work.id}>
-                <img className="work-cover" src={work.cover} alt={`${work.title} 封面图`} />
-                <div className="work-meta">
-                  <span className="work-track">
-                    {work.track === 'landing' ? '落地作品' : '纯想法'}
-                  </span>
-                  <span className="work-status">{work.status}</span>
-                </div>
+                {'cover' in work ? (
+                  <img className="work-cover" src={work.cover} alt={`${work.title} 封面图`} />
+                ) : null}
                 <h3>{work.title}</h3>
-                <p>{work.summary}</p>
-                <div className="work-tags" aria-label={`${work.title} 的内容类型`}>
-                  {work.media.map((item) => (
-                    <span className="work-tag" key={item}>
-                      {item}
-                    </span>
-                  ))}
-                </div>
+                <p>{getGalleryDescription(work.description)}</p>
                 <a className="card-button" href={`#/work/${work.id}`}>
                   查看详情
                 </a>
@@ -470,43 +506,61 @@ function App() {
             </div>
           </div>
           <article className="detail-card">
-            <img className="detail-cover" src={detailWork.cover} alt={`${detailWork.title} 展示图`} />
-            <div className="detail-meta">
-              <span className="work-track">
-                {detailWork.track === 'landing' ? '落地作品' : '纯想法'}
-              </span>
-              <span className="work-status">{detailWork.status}</span>
-            </div>
+            {'cover' in detailWork ? (
+              <img
+                className="detail-cover"
+                src={detailWork.cover}
+                alt={`${detailWork.title} 展示图`}
+              />
+            ) : null}
             <h1 id="detail-title">{detailWork.title}</h1>
-            <p className="detail-summary">{detailWork.summary}</p>
             <div className="detail-info">
               <div>
                 <span className="detail-label">作者</span>
                 <p>{detailWork.author}</p>
               </div>
-              <div>
-                <span className="detail-label">内容类型</span>
-                <div className="work-tags">
-                  {detailWork.media.map((item) => (
-                    <span className="work-tag" key={item}>
-                      {item}
-                    </span>
-                  ))}
+              {'website' in detailWork ? (
+                <div>
+                  <span className="detail-label">可访问网址</span>
+                  <div className="detail-link-row">
+                    <a
+                      className="detail-link"
+                      href={getExternalHref(detailWork.website)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {detailWork.website}
+                    </a>
+                    <button
+                      className="copy-button"
+                      type="button"
+                      onClick={() => copyText(detailWork.website)}
+                    >
+                      复制
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
             <div className="detail-block">
               <h2>作品说明</h2>
               <p>{detailWork.description}</p>
             </div>
-            <div className="detail-block">
-              <h2>当前提交内容</h2>
-              <ul className="detail-list">
-                {detailWork.deliverables.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
+            {'assets' in detailWork ? (
+              <div className="detail-block">
+                <h2>作品截图/视频</h2>
+                <div className="detail-gallery">
+                  {detailWork.assets.map((item, index) => (
+                    <img
+                      key={item.src}
+                      className="detail-gallery-media"
+                      src={item.src}
+                      alt={`${detailWork.title} 截图 ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </article>
         </section>
       ) : (

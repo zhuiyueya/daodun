@@ -556,6 +556,11 @@
   color: var(--heading);
 }
 
+.detail-card h1 {
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  line-height: 1.2;
+}
+
 .detail-cover {
   max-height: 420px;
   background: rgba(255, 255, 255, 0.03);
@@ -566,12 +571,6 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-}
-
-.detail-summary {
-  margin: -8px 0 0;
-  color: var(--heading);
-  font-size: 1.12rem;
 }
 
 .detail-info {
@@ -604,10 +603,60 @@
   color: var(--muted);
 }
 
+.detail-link {
+  color: var(--accent);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.detail-link:hover {
+  text-decoration: underline;
+}
+
+.detail-link-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.copy-button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--heading);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.copy-button:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
 .detail-list {
   padding-left: 1.2rem;
   display: grid;
   gap: 10px;
+}
+
+.detail-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.detail-gallery-media {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .prize-card {
@@ -623,7 +672,13 @@
 }
 
 .prize-copy {
+  display: grid;
+  gap: 10px;
   color: var(--muted);
+}
+
+.prize-copy p {
+  margin: 0;
 }
 
 .prize-image {
@@ -668,8 +723,14 @@
   .format-grid,
   .examples-grid,
   .detail-info,
+  .detail-gallery,
   .works-grid {
     grid-template-columns: 1fr;
+  }
+
+  .detail-link-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .hero-grid {
