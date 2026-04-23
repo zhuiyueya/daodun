@@ -27,7 +27,7 @@ interface SubmitWorkBody {
   }>
 }
 
-const allowedPlatformTypes = ['none', 'website', 'douyin', 'bilibili', 'other']
+const allowedPlatformTypes = ['none', 'website', 'douyin', 'bilibili', 'offline_app', 'other']
 
 export const onRequestGet: PagesFunction = async (context) =>
   withErrorHandling(async () => {

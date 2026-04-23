@@ -437,7 +437,9 @@ function SubmitPage({
         <div className="section-heading">
           <p className="eyebrow">提交作品</p>
           <h1 id="submit-title">登录后直接交作品</h1>
-          <p className="form-copy">当前只支持图片上传。视频类作品请填写平台链接，AI 视频请带上 #刀盾杯 标签。</p>
+          <p className="form-copy">
+            当前只支持图片上传；视频类作品请填写平台链接并带上 #刀盾杯 标签；如果是未上线 APP等，请先上传到百度网盘等平台，再把分享链接填在作品链接里。
+          </p>
         </div>
 
         <div className="inline-choice">
@@ -512,14 +514,18 @@ function SubmitPage({
             <label className="field">
               <span>链接类型</span>
               <select value={platformType} onChange={(event) => setPlatformType(event.target.value as PlatformType)}>
-                <option value="website">网站 / Demo</option>
+                <option value="website">网站 / Demo 链接</option>
                 <option value="douyin">抖音</option>
                 <option value="bilibili">B 站</option>
+                <option value="offline_app">网盘链接</option>
                 <option value="other">其他平台</option>
               </select>
             </label>
             {(platformType === 'douyin' || platformType === 'bilibili') ? (
               <p className="helper-text">AI 视频作品发布到平台时请带上 #刀盾杯 标签，再提交作品链接。</p>
+            ) : null}
+            {platformType === 'offline_app' ? (
+              <p className="helper-text">未上线 APP 请存放到百度网盘等平台，并在作品链接中填写可访问的分享链接。</p>
             ) : null}
           </>
         ) : null}

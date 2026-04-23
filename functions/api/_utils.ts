@@ -224,18 +224,31 @@ export function buildUploadPrefix(env: Env) {
   return raw.endsWith('/') ? raw : `${raw}/`
 }
 
-export function normalizeRegion(rawRegion: string) {
-  return rawRegion.replace(/^https?:\/\//, '').replace(/\.aliyuncs\.com$/, '')
+function requireEnvString(name: string, value: string | undefined) {
+  const trimmed = value?.trim()
+
+  if (!trimmed) {
+    throw new Error(`服务端环境变量缺失：${name}`)
+  }
+
+  return trimmed
+}
+
+export function normalizeRegion(rawRegion: string | undefined) {
+  const safeRegion = requireEnvString('OSS_REGION', rawRegion)
+
+  return safeRegion.replace(/^https?:\/\//, '').replace(/\.aliyuncs\.com$/, '')
 }
 
 export function getBucketHost(env: Env) {
+  const bucket = requireEnvString('OSS_BUCKET', env.OSS_BUCKET)
   const region = normalizeRegion(env.OSS_REGION)
 
-  return `https://${env.OSS_BUCKET}.${region}.aliyuncs.com`
+  return `https://${bucket}.${region}.aliyuncs.com`
 }
 
 export function getPublicBaseUrl(env: Env) {
-  const url = env.OSS_PUBLIC_BASE_URL.trim()
+  const url = requireEnvString('OSS_PUBLIC_BASE_URL', env.OSS_PUBLIC_BASE_URL)
 
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url.replace(/\/$/, '')

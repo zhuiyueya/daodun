@@ -1,6 +1,6 @@
 export type Track = 'landing' | 'idea'
 export type WorkStatus = 'pending' | 'approved' | 'rejected'
-export type PlatformType = 'none' | 'website' | 'douyin' | 'bilibili' | 'other'
+export type PlatformType = 'none' | 'website' | 'douyin' | 'bilibili' | 'offline_app' | 'other'
 
 export interface SessionUser {
   id: string
