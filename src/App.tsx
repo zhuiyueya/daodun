@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 
 import './App.css'
 import {
   ApiError,
   approveWork,
   createWork,
+  deleteWork,
   fetchMe,
   fetchPendingWorks,
   fetchWork,
@@ -13,6 +14,7 @@ import {
   logout,
   rejectWork,
   requestCode,
+  updateWork,
   uploadImage,
   verifyCode,
 } from './lib/api'
@@ -80,6 +82,7 @@ type CurrentPage =
   | { page: 'home' }
   | { page: 'gallery' }
   | { page: 'detail'; workId: string }
+  | { page: 'edit'; workId: string }
   | { page: 'auth'; next: string }
   | { page: 'submit' }
   | { page: 'my' }
@@ -95,6 +98,13 @@ function getCurrentPage(): CurrentPage {
     return {
       page: 'detail',
       workId: path.replace('/work/', ''),
+    }
+  }
+
+  if (path.startsWith('/edit/')) {
+    return {
+      page: 'edit',
+      workId: path.replace('/edit/', ''),
     }
   }
 
@@ -574,6 +584,369 @@ function SubmitPage({
   )
 }
 
+function EditWorkPage({
+  me,
+  workId,
+  onUpdated,
+  onNotice,
+}: {
+  me: SessionUser | null
+  workId: string
+  onUpdated: () => Promise<void>
+  onNotice: (message: string) => void
+}) {
+  type DraftImage =
+    | { id: string; kind: 'existing'; url: string }
+    | { id: string; kind: 'new'; file: File; previewUrl: string }
+
+  const [loadingWork, setLoadingWork] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [notFound, setNotFound] = useState(false)
+  const [track, setTrack] = useState<Track>('landing')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [authorName, setAuthorName] = useState('')
+  const [externalUrl, setExternalUrl] = useState('')
+  const [platformType, setPlatformType] = useState<PlatformType>('website')
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
+  const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [images, setImages] = useState<DraftImage[]>([])
+  const notify = useEffectEvent(onNotice)
+  const coverInputId = `edit-cover-${workId}`
+  const extraInputId = `edit-extra-${workId}`
+
+  const titleLength = title.trim().length
+  const descriptionLength = description.trim().length
+  const authorLength = authorName.trim().length
+  const totalImages = (coverImageUrl || coverFile ? 1 : 0) + images.length
+
+  useEffect(
+    () => () => {
+      for (const image of images) {
+        if (image.kind === 'new') {
+          URL.revokeObjectURL(image.previewUrl)
+        }
+      }
+    },
+    [images],
+  )
+
+  useEffect(() => {
+    async function loadWork() {
+      try {
+        setLoadingWork(true)
+        const response = await fetchWork(workId)
+        const work = response.work
+        setTrack(work.track)
+        setTitle(work.title)
+        setDescription(work.description)
+        setAuthorName(work.authorName)
+        setExternalUrl(work.externalUrl ?? '')
+        setPlatformType(work.platformType)
+        setCoverImageUrl(work.coverImageUrl ?? null)
+        setCoverFile(null)
+        setImages(
+          work.imageUrls.map((url, index) => ({
+            id: `existing-${index}-${url}`,
+            kind: 'existing' as const,
+            url,
+          })),
+        )
+        setNotFound(false)
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 404) {
+          setNotFound(true)
+          return
+        }
+        notify(error instanceof Error ? error.message : '作品加载失败')
+      } finally {
+        setLoadingWork(false)
+      }
+    }
+
+    void loadWork()
+  }, [workId])
+
+  async function handleSave() {
+    if (!title.trim()) {
+      onNotice('请填写作品标题')
+      return
+    }
+
+    if (titleLength > TITLE_MAX) {
+      onNotice(`作品标题不能超过 ${TITLE_MAX} 个字`)
+      return
+    }
+
+    if (!description.trim()) {
+      onNotice('请填写作品说明')
+      return
+    }
+
+    if (descriptionLength > DESCRIPTION_MAX) {
+      onNotice(`作品说明不能超过 ${DESCRIPTION_MAX} 个字`)
+      return
+    }
+
+    if (!authorName.trim()) {
+      onNotice('请填写作者名称')
+      return
+    }
+
+    if (authorLength > AUTHOR_MAX) {
+      onNotice(`作者名称不能超过 ${AUTHOR_MAX} 个字`)
+      return
+    }
+
+    if (track === 'landing' && !externalUrl.trim()) {
+      onNotice('落地作品请填写作品链接')
+      return
+    }
+
+    if (track === 'landing' && !coverImageUrl && !coverFile) {
+      onNotice('落地作品请上传封面图')
+      return
+    }
+
+    if (totalImages > 9) {
+      onNotice('图片总数最多 9 张')
+      return
+    }
+
+    try {
+      setSaving(true)
+      const uploadedCover = coverFile ? await uploadImage(coverFile) : null
+      const imageAssets = []
+
+      for (const image of images) {
+        if (image.kind === 'existing') {
+          imageAssets.push({ url: image.url })
+          continue
+        }
+
+        imageAssets.push(await uploadImage(image.file))
+      }
+
+      await updateWork(workId, {
+        title: title.trim(),
+        description: description.trim(),
+        authorName: authorName.trim(),
+        externalUrl: track === 'landing' ? (externalUrl.trim() || null) : null,
+        platformType: track === 'landing' ? platformType : 'none',
+        coverImage: uploadedCover ?? (coverImageUrl ? { url: coverImageUrl } : null),
+        images: imageAssets,
+      })
+      onNotice('作品已更新，重新进入审核队列')
+      await onUpdated()
+      goTo('/my')
+    } catch (error) {
+      onNotice(error instanceof Error ? error.message : '更新失败')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!me) {
+    return (
+      <section className="form-page" aria-labelledby="edit-title">
+        <article className="detail-card form-card">
+          <div className="section-heading">
+            <p className="eyebrow">编辑作品</p>
+            <h1 id="edit-title">请先登录</h1>
+            <p className="form-copy">登录后才能编辑自己的作品。</p>
+          </div>
+          <div className="form-actions">
+            <a className="primary-button" href={`#/auth?next=${encodeURIComponent(`/edit/${workId}`)}`}>
+              去登录
+            </a>
+          </div>
+        </article>
+      </section>
+    )
+  }
+
+  if (loadingWork) {
+    return (
+      <section className="form-page">
+        <article className="detail-card form-card">
+          <p className="form-copy">正在加载作品...</p>
+        </article>
+      </section>
+    )
+  }
+
+  if (notFound) {
+    return (
+      <section className="form-page">
+        <article className="detail-card form-card">
+          <h1>作品不存在</h1>
+          <p className="form-copy">这个作品不存在，或你没有编辑权限。</p>
+          <a className="primary-button" href="#/my">
+            返回我的作品
+          </a>
+        </article>
+      </section>
+    )
+  }
+
+  return (
+    <section className="form-page" aria-labelledby="edit-title">
+      <div className="detail-toolbar">
+        <a className="secondary-link back-link" href="#/my">
+          返回我的作品
+        </a>
+      </div>
+      <article className="detail-card form-card">
+        <div className="section-heading">
+          <p className="eyebrow">编辑作品</p>
+          <h1 id="edit-title">修改后将重新进入审核</h1>
+          <p className="helper-text">字数限制：标题 1-30 字，作品说明 1-1200 字，作者名称 1-15 字。</p>
+        </div>
+
+        <label className="field">
+          <span>作品标题</span>
+          <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={TITLE_MAX} />
+          <small className="field-counter">{titleLength}/{TITLE_MAX}</small>
+        </label>
+
+        <label className="field">
+          <span>作品说明</span>
+          <textarea
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            rows={6}
+            maxLength={DESCRIPTION_MAX}
+          />
+          <small className="field-counter">{descriptionLength}/{DESCRIPTION_MAX}</small>
+        </label>
+
+        <label className="field">
+          <span>作者名称</span>
+          <input value={authorName} onChange={(event) => setAuthorName(event.target.value)} maxLength={AUTHOR_MAX} />
+          <small className="field-counter">{authorLength}/{AUTHOR_MAX}</small>
+        </label>
+
+        {track === 'landing' ? (
+          <>
+            <label className="field">
+              <span>作品链接</span>
+              <input value={externalUrl} onChange={(event) => setExternalUrl(event.target.value)} />
+            </label>
+            <label className="field">
+              <span>链接类型</span>
+              <select value={platformType} onChange={(event) => setPlatformType(event.target.value as PlatformType)}>
+                <option value="website">网站 / Demo</option>
+                <option value="douyin">抖音</option>
+                <option value="bilibili">B 站</option>
+                <option value="offline_app">未上线 APP（网盘链接）</option>
+                <option value="other">其他平台</option>
+              </select>
+            </label>
+          </>
+        ) : null}
+
+        <div className="field upload-field">
+          <span>{track === 'landing' ? '封面图（必传）' : '封面图（可选）'}</span>
+          {coverImageUrl ? (
+            <img className="detail-gallery-media" src={coverImageUrl} alt="当前封面图" />
+          ) : null}
+          <input
+            id={coverInputId}
+            className="hidden-file-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(event) => {
+              const file = event.target.files?.[0] ?? null
+
+              if (!file) {
+                return
+              }
+
+              setCoverFile(file)
+              setCoverImageUrl(URL.createObjectURL(file))
+            }}
+          />
+          <div className="card-actions">
+            <label className="upload-trigger" htmlFor={coverInputId}>
+              {coverImageUrl ? '更换封面图' : '选择封面图'}
+            </label>
+            {coverImageUrl ? (
+              <button
+                className="ghost-button"
+                type="button"
+                onClick={() => {
+                  setCoverImageUrl(null)
+                  setCoverFile(null)
+                }}
+              >
+                删除封面图
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="field upload-field">
+          <span>补充图片（最多 8 张）</span>
+          <input
+            id={extraInputId}
+            className="hidden-file-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            onChange={(event) => {
+              const files = Array.from(event.target.files ?? [])
+              if (!files.length) {
+                return
+              }
+
+              const appended = files.map((file) => ({
+                id: `new-${crypto.randomUUID()}`,
+                kind: 'new' as const,
+                file,
+                previewUrl: URL.createObjectURL(file),
+              }))
+
+              setImages((prev) => [...prev, ...appended])
+            }}
+          />
+          <label className="upload-trigger" htmlFor={extraInputId}>
+            添加补充图片
+          </label>
+          {images.length ? (
+            <div className="detail-gallery">
+              {images.map((image) => (
+                <div className="field" key={image.id}>
+                  <img
+                    className="detail-gallery-media"
+                    src={image.kind === 'existing' ? image.url : image.previewUrl}
+                    alt="补充图片预览"
+                  />
+                  <button
+                    className="ghost-button"
+                    type="button"
+                    onClick={() => {
+                      setImages((prev) => prev.filter((item) => item.id !== image.id))
+                    }}
+                  >
+                    删除这张图
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <small>当前共 {(coverImageUrl || coverFile ? 1 : 0) + images.length}/9 张图片</small>
+        </div>
+
+        <div className="form-actions">
+          <button className="primary-button" type="button" onClick={() => void handleSave()} disabled={saving}>
+            {saving ? '保存中...' : '保存修改'}
+          </button>
+        </div>
+      </article>
+    </section>
+  )
+}
+
 function StatusBadge({ status }: { status: string | undefined }) {
   const labelMap = {
     pending: '待审核',
@@ -584,7 +957,7 @@ function StatusBadge({ status }: { status: string | undefined }) {
   return <span className={`status-badge ${status ?? 'pending'}`}>{labelMap[status as keyof typeof labelMap] ?? '待审核'}</span>
 }
 
-function MyWorksPage({ works }: { works: PublicWork[] }) {
+function MyWorksPage({ works, onDelete }: { works: PublicWork[]; onDelete: (id: string) => Promise<void> }) {
   return (
     <section className="gallery-page" aria-labelledby="my-works-title">
       <div className="detail-toolbar">
@@ -608,9 +981,25 @@ function MyWorksPage({ works }: { works: PublicWork[] }) {
               <h3>{work.title}</h3>
               <p>{getGalleryDescription(work.description)}</p>
               {work.rejectReason ? <p className="reject-copy">驳回原因：{work.rejectReason}</p> : null}
-              <a className="card-button" href={`#/work/${work.id}`}>
-                查看详情
-              </a>
+              <div className="card-actions">
+                <a className="card-button" href={`#/work/${work.id}`}>
+                  查看详情
+                </a>
+                <a className="ghost-button" href={`#/edit/${work.id}`}>
+                  编辑
+                </a>
+                <button
+                  className="ghost-button"
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('确认删除这个作品吗？删除后不可恢复。')) {
+                      void onDelete(work.id)
+                    }
+                  }}
+                >
+                  删除
+                </button>
+              </div>
             </article>
           ))}
         </div>
@@ -868,6 +1257,17 @@ function App() {
       await refreshAdminWorks()
     } catch (error) {
       setNotice(error instanceof Error ? error.message : '驳回失败')
+    }
+  }
+
+  async function handleDeleteMyWork(id: string) {
+    try {
+      await deleteWork(id)
+      setNotice('作品已删除')
+      await refreshMyWorks()
+      await refreshGallery(activeFilter)
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : '删除失败')
     }
   }
 
@@ -1167,6 +1567,18 @@ function App() {
         <SubmitPage me={me} onSubmitted={() => void refreshMyWorks()} onNotice={(message) => setNotice(message)} />
       ) : null}
 
+      {currentPage.page === 'edit' ? (
+        <EditWorkPage
+          me={me}
+          workId={currentPage.workId}
+          onUpdated={async () => {
+            await refreshMyWorks()
+            await refreshGallery(activeFilter)
+          }}
+          onNotice={(message) => setNotice(message)}
+        />
+      ) : null}
+
       {currentPage.page === 'my' ? (
         loading.my && myWorks.length === 0 ? (
           <section className="form-page">
@@ -1175,7 +1587,7 @@ function App() {
             </article>
           </section>
         ) : (
-          <MyWorksPage works={myWorks} />
+          <MyWorksPage works={myWorks} onDelete={handleDeleteMyWork} />
         )
       ) : null}
 

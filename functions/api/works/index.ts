@@ -120,6 +120,20 @@ export const onRequestPost: PagesFunction = async (context) =>
       throw new HttpError(400, '落地作品请填写作品链接')
     }
 
+    const workCount = await context.env.DB.prepare(
+      `
+        SELECT COUNT(*) AS count
+        FROM works
+        WHERE user_id = ?
+      `,
+    )
+      .bind(user.id)
+      .first<{ count: number }>()
+
+    if ((workCount?.count ?? 0) >= 3) {
+      throw new HttpError(400, '每人最多提交 3 个作品，请先删除后再提交')
+    }
+
     const coverAsset = assertStoredAsset(context.env, body.coverImage ?? null, track === 'landing')
     const imageAssets = assertStoredAssets(context.env, body.images ?? [])
     const finalCover = coverAsset ?? imageAssets[0] ?? null

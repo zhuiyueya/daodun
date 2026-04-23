@@ -158,4 +158,35 @@ export async function createWork(payload: {
   })
 }
 
+export async function updateWork(
+  id: string,
+  payload: {
+    title: string
+    description: string
+    authorName: string
+    externalUrl: string | null
+    platformType: PlatformType
+    coverImage?: {
+      url?: string
+      objectKey?: string
+    } | null
+    images?: Array<{
+      url?: string
+      objectKey?: string
+    }>
+  },
+) {
+  return request<{ ok: boolean }>(`/api/works/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function deleteWork(id: string) {
+  return request<{ ok: boolean }>(`/api/works/${id}`, {
+    method: 'DELETE',
+    body: JSON.stringify({}),
+  })
+}
+
 export { ApiError }
