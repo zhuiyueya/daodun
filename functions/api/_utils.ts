@@ -9,6 +9,8 @@ export interface Env {
   OSS_UPLOAD_PREFIX?: string
   SMTP_USER: string
   SMTP_PASS: string
+  SMTP_HOST?: string
+  SMTP_PORT?: string
   ADMIN_EMAILS?: string
 }
 

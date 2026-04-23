@@ -78,6 +78,8 @@ export const onRequestPost: PagesFunction = async (context) =>
     await sendMailWithQqSmtp({
       user: context.env.SMTP_USER,
       pass: context.env.SMTP_PASS,
+      host: context.env.SMTP_HOST,
+      port: Number.parseInt(context.env.SMTP_PORT ?? '465', 10),
       to: email,
       subject: '刀盾杯登录验证码',
       text: `你的刀盾杯登录验证码是：${code}\n\n有效期十分钟，请勿转发给他人。`,

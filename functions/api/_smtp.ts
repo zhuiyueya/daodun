@@ -95,20 +95,26 @@ async function writeLine(writer: WritableStreamDefaultWriter<Uint8Array>, line: 
 export async function sendMailWithQqSmtp({
   user,
   pass,
+  host,
+  port,
   to,
   subject,
   text,
 }: {
   user: string
   pass: string
+  host?: string
+  port?: number
   to: string
   subject: string
   text: string
 }) {
+  const smtpHost = host?.trim() || 'smtp.qq.com'
+  const smtpPort = Number.isFinite(port) && port ? port : 465
   const socket = connect(
     {
-      hostname: 'smtp.qq.com',
-      port: 465,
+      hostname: smtpHost,
+      port: smtpPort,
     },
     {
       secureTransport: 'on',
