@@ -16,7 +16,6 @@ import {
   uploadImage,
   verifyCode,
 } from './lib/api'
-import { sampleWorks } from './lib/sampleWorks'
 import type { PlatformType, PublicWork, SessionUser, Track } from './types'
 import prizePreview from './assets/5FC9B1BF14E3034F2CD2E29B48605F13.jpg'
 import groupQrCode from './assets/qrcode.jpg'
@@ -888,18 +887,14 @@ function App() {
     { label: '秒', value: timeLeft.seconds },
   ]
 
-  const galleryWorks = liveWorks.length ? liveWorks : sampleWorks
-  const filteredWorks = galleryWorks.filter((work) => {
+  const filteredWorks = liveWorks.filter((work) => {
     if (activeFilter === 'all') {
       return true
     }
 
     return work.track === activeFilter
   })
-  const fallbackDetail = currentPage.page === 'detail'
-    ? sampleWorks.find((work) => work.id === currentPage.workId) ?? null
-    : null
-  const currentDetail = detailWork ?? fallbackDetail
+  const currentDetail = detailWork
 
   return (
     <main className="page-shell">
@@ -1082,6 +1077,7 @@ function App() {
             <ToolbarActions me={me} onLogout={handleLogout} />
           </div>
           {loading.gallery && liveWorks.length === 0 ? <p className="meta-text">正在加载作品...</p> : null}
+          {!loading.gallery && filteredWorks.length === 0 ? <p className="meta-text">暂无作品，敬请期待。</p> : null}
           <div className="works-grid">
             {filteredWorks.map((work) => (
               <article className="work-card" key={work.id}>
