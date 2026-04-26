@@ -20,7 +20,7 @@ import {
 } from './lib/api'
 import type { PlatformType, PublicWork, SessionUser, Track } from './types'
 import prizePreview from './assets/5FC9B1BF14E3034F2CD2E29B48605F13.jpg'
-import groupQrCode from './assets/qrcode.jpg'
+import groupQrCode from './assets/qrcode.jpeg'
 
 const registrationUrl =
   'https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd'
