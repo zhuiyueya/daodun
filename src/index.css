@@ -1,13 +1,15 @@
 :root {
-  --bg: #050706;
-  --panel: #0a0f0c;
-  --border: rgba(120, 146, 129, 0.22);
-  --heading: #f4fff8;
-  --text: #d4dfd8;
-  --muted: #91a095;
-  --accent: #4cff99;
-  --button-border: rgba(76, 255, 153, 0.32);
-  --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  --bg: #06060d;
+  --panel: #0d0d1a;
+  --panel-strong: #111125;
+  --border: rgba(255, 255, 255, 0.08);
+  --heading: #f6f4ff;
+  --text: #d8d3ec;
+  --muted: #a0a0b8;
+  --accent: #8b5cf6;
+  --accent-strong: #ec4899;
+  --button-border: rgba(139, 92, 246, 0.48);
+  --shadow: 0 22px 70px rgba(0, 0, 0, 0.42);
   --sans:
     'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     sans-serif;
@@ -22,8 +24,9 @@
   font-weight: 400;
   color: var(--text);
   background:
-    radial-gradient(circle at top, rgba(76, 255, 153, 0.08), transparent 24%),
-    linear-gradient(180deg, #08100b 0%, #040605 100%);
+    radial-gradient(circle at top, rgba(139, 92, 246, 0.12), transparent 24%),
+    radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.08), transparent 26%),
+    linear-gradient(180deg, #090912 0%, #05050b 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -54,7 +57,8 @@ body::before {
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 48px 48px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 92%);
+  opacity: 0.28;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 92%);
 }
 
 #root {

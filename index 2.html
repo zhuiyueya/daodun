@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABSTRACT JAM 2026 | 抽象创作大赛 · 让好想法被看见</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06060d;
+            --bg-card: #0d0d1a;
+            --bg-card-hover: #111125;
+            --text: #e8e8f0;
+            --text-secondary: #a0a0b8;
+            --text-muted: #6b6b80;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-orange: #f97316;
+            --accent-cyan: #06d6f0;
+            --accent-lime: #a3e635;
+            --accent-yellow: #fbbf24;
+            --glow-purple: rgba(139, 92, 246, 0.45);
+            --glow-pink: rgba(236, 72, 153, 0.4);
+            --glow-cyan: rgba(6, 214, 240, 0.35);
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-glow: rgba(139, 92, 246, 0.3);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 36px;
+            --font-display: 'Space Grotesk', 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+            --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: #2a2a45 #0a0a14;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a14;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a45;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3d3d60;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            cursor: default;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 28px;
+            height: 28px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.08s ease-out, border-color 0.3s, width 0.25s, height 0.25s;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+            display: none;
+        }
+
+        .custom-cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transition: transform 0.04s ease-out, width 0.25s, height 0.25s;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+            display: none;
+        }
+
+        .custom-cursor.hovering {
+            width: 50px;
+            height: 50px;
+            border-color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.1);
+            mix-blend-mode: normal;
+        }
+
+        .custom-cursor-dot.hovering {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-pink);
+            mix-blend-mode: normal;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+
+            .custom-cursor,
+            .custom-cursor-dot {
+                display: block;
+            }
+
+            body {
+                cursor: none;
+            }
+
+            a,
+            button,
+            .clickable,
+            input,
+            textarea,
+            .card-interactive {
+                cursor: none;
+            }
+        }
+
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(100px);
+            opacity: 0.5;
+            animation: orbFloat 14s ease-in-out infinite;
+        }
+
+        .glow-orb--1 {
+            width: 500px;
+            height: 500px;
+            background: var(--glow-purple);
+            top: -15%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .glow-orb--2 {
+            width: 400px;
+            height: 400px;
+            background: var(--glow-pink);
+            bottom: -12%;
+            right: -8%;
+            animation-delay: -5s;
+            animation-duration: 16s;
+        }
+
+        .glow-orb--3 {
+            width: 350px;
+            height: 350px;
+            background: var(--glow-cyan);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -9s;
+            animation-duration: 18s;
+            opacity: 0.3;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(60px, -40px) scale(1.15);
+            }
+
+            50% {
+                transform: translate(-30px, 50px) scale(0.9);
+            }
+
+            75% {
+                transform: translate(-50px, -30px) scale(1.08);
+            }
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(0px);
+            background: transparent;
+        }
+
+        .navbar.scrolled {
+            backdrop-filter: blur(20px);
+            background: rgba(6, 6, 13, 0.75);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 10px 32px;
+        }
+
+        .navbar__logo {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar__logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .navbar__cta {
+            padding: 0 18px;
+            height: 40px;
+            border-radius: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.02);
+            color: #fff;
+            border: 1px solid rgba(139, 92, 246, 0.7);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition-fast);
+            white-space: nowrap;
+            box-shadow: inset 0 0 0 1px rgba(236, 72, 153, 0.12);
+        }
+
+        .navbar__cta:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(236, 72, 153, 0.18));
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.35);
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+
+            .navbar.scrolled {
+                padding: 8px 16px;
+            }
+
+            .navbar__logo {
+                font-size: 1.1rem;
+            }
+
+            .navbar__logo-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+
+            .navbar__cta {
+                padding: 0 14px;
+                height: 36px;
+                font-size: 0.8rem;
+            }
+        }
+
+        .section {
+            position: relative;
+            padding: 80px 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding: 50px 16px;
+            }
+        }
+
+        .banner-i_Yh8o {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-inline: auto;
+            max-width: 1260px;
+            min-height: calc(100vh - 64px);
+            padding-inline: 16px;
+            padding-top: 54px;
+            padding-bottom: 80px;
+            width: 100%;
+        }
+
+        .content-Zb4JPH {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 800px;
+            text-align: center;
+            margin-top: 64px;
+        }
+
+        .brandTag-P_NYF_ {
+            margin-bottom: 24px;
+        }
+
+        .bannerLogo-UMdfCG {
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            line-height: 1;
+            text-transform: uppercase;
+            width: auto;
+            height: auto;
+        }
+
+        .title-uqzzX8 {
+            color: #fff;
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 700;
+            line-height: 1.08;
+            margin: 0;
+        }
+
+        .title-uqzzX8 .title-line {
+            display: block;
+            white-space: nowrap;
+        }
+
+        .title-uqzzX8 .title-line + .title-line {
+            margin-top: 0.08em;
+        }
+
+        .subtitle-fKoPka {
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 1.05rem;
+            font-weight: 400;
+            line-height: 1.8;
+            max-width: 720px;
+            min-width: 100%;
+        }
+
+        .subtitle-fKoPka p {
+            margin: 0;
+        }
+
+        .subtitle-fKoPka .subtitle-line {
+            display: block;
+        }
+
+        .ctaButton-zsPMZb {
+            align-items: center;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            border: none;
+            border-radius: 0;
+            color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            flex-shrink: 0;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 600;
+            height: 40px;
+            justify-content: center;
+            line-height: 14px;
+            min-width: 96px;
+            overflow: hidden;
+            padding: 0 10px;
+            text-decoration: none;
+            text-overflow: ellipsis;
+            transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+            width: 343px;
+            box-shadow: 0 16px 36px rgba(139, 92, 246, 0.28);
+        }
+
+        .ctaButton-zsPMZb:hover {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
+            box-shadow: 0 20px 44px rgba(139, 92, 246, 0.34);
+        }
+
+        .eventTime-byby0q {
+            background: linear-gradient(90deg, #4d5360, #d5dff6 50%, #4d5360);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.2;
+            max-width: 720px;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .heroImage-rpOmws {
+            margin-top: 48px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .heroImage-rpOmws img {
+            border-radius: 8px;
+            display: block;
+            height: auto;
+            width: 100%;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            font-family: var(--font-display);
+            letter-spacing: -0.01em;
+            transition: var(--transition-bounce);
+            border: none;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .btn--primary {
+            background: #fff;
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 4px 24px rgba(255, 255, 255, 0.15);
+        }
+
+        .btn--primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.45);
+            background: #f0eaff;
+        }
+
+        .btn--secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .btn--secondary:hover {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .btn--glow::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 53px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink), var(--accent-orange));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.35s;
+            filter: blur(8px);
+        }
+
+        .btn--glow:hover::before {
+            opacity: 0.8;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+
+        .section-header__label {
+            display: inline-block;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-purple);
+            margin-bottom: 12px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .section-header__title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(2rem, 4vw, 3rem);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 14px;
+            color: #fff;
+        }
+
+        .section-header__desc {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .section--dual {
+            display: grid;
+            grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+            gap: 28px;
+            align-items: stretch;
+        }
+
+        .section-panel {
+            min-width: 0;
+            display: flex;
+        }
+
+        .section-panel__inner {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 32px 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            min-height: 100%;
+        }
+
+        .section-panel .section-header {
+            text-align: left;
+        }
+
+        .section-panel .section-header__desc {
+            margin: 0;
+            max-width: none;
+        }
+
+        .section-panel-note {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .section--dual {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .section-panel__inner {
+                padding: 0;
+                background: transparent;
+                border: none;
+                border-radius: 0;
+            }
+
+            .section-panel .section-header {
+                text-align: center;
+            }
+
+            .section-panel .section-header__desc {
+                margin: 0 auto;
+                max-width: 650px;
+            }
+
+            .section-panel-note {
+                text-align: center;
+            }
+        }
+
+        .about-copy {
+            max-width: 820px;
+            margin: 0 auto;
+            font-size: 1.02rem;
+            color: var(--text-secondary);
+            line-height: 1.95;
+            text-align: left;
+        }
+
+        .about-copy strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* 参赛指南卡片布局：两列 */
+        .submit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .submit-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+        }
+
+        .submit-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 22px 20px;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-glow);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 92, 246, 0.1);
+        }
+
+        .submit-card__title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.08rem;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .submit-card__desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .submit-card__badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 3px 10px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 50px;
+            font-size: 0.72rem;
+            color: var(--accent-purple);
+        }
+
+        .vibe-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 50px 40px;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .vibe-section__visual {
+            flex: 1;
+            min-width: 280px;
+            background: #0a0a18;
+            border-radius: var(--radius-md);
+            padding: 28px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            border: 1px solid var(--border-subtle);
+            position: relative;
+        }
+
+        .vibe-section__visual::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+
+        .vibe-section__visual-dot {
+            position: absolute;
+            top: 10px;
+            left: 16px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff5f57;
+            box-shadow: 18px 0 0 #febc2e, 36px 0 0 #28c840;
+        }
+
+        .vibe-section__text {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .vibe-section__text h3 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+        }
+
+        .vibe-section__text p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 50px;
+            background: rgba(6, 214, 240, 0.1);
+            color: var(--accent-cyan);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .prizes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .prizes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .prize-card--featured {
+                order: -1;
+            }
+        }
+
+        .prize-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 24px 22px 22px;
+            text-align: center;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .prize-card--featured {
+            border-color: var(--border-glow);
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.06) 0%, var(--bg-card) 40%);
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.1);
+        }
+
+        .prize-card__label {
+            font-family: var(--font-display);
+            font-size: 1.28rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .prize-card__list {
+            list-style: none;
+            width: fit-content;
+            margin: 0 auto;
+            text-align: left;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .prize-card__list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .prize-card__list li::before {
+            content: '✦';
+            color: var(--accent-purple);
+            flex: 0 0 auto;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-subtle);
+        }
+
+        .timeline__item {
+            position: relative;
+            margin-bottom: 32px;
+            padding-left: 24px;
+        }
+
+        .timeline__item::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            border: 3px solid var(--bg);
+            box-shadow: 0 0 16px var(--glow-purple);
+        }
+
+        .timeline__item-date {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--accent-purple);
+        }
+
+        .faq-list {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .faq-item__question {
+            width: 100%;
+            padding: 18px 22px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .faq-item__arrow {
+            transition: transform 0.35s ease;
+            color: var(--text-muted);
+        }
+
+        .faq-item.open .faq-item__arrow {
+            transform: rotate(180deg);
+            color: var(--accent-purple);
+        }
+
+        .faq-item__answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.45s ease, padding 0.45s ease;
+            padding: 0 22px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .faq-item.open .faq-item__answer {
+            max-height: 300px;
+            padding: 16px 22px 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .cta-banner {
+            text-align: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-banner::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: var(--glow-purple);
+            filter: blur(100px);
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 32px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-subtle);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 36px 28px;
+            width: 100%;
+            max-width: 480px;
+            transform: translateY(20px);
+            transition: transform 0.35s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal__close {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal__form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal__form input,
+        .modal__form textarea {
+            padding: 13px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+        }
+
+        .modal__success {
+            text-align: center;
+            padding: 20px 0;
+            display: none;
+        }
+
+        .modal__success.show {
+            display: block;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (min-width: 744px) {
+            .banner-i_Yh8o {
+                padding-inline: 24px;
+            }
+
+            .heroImage-rpOmws {
+                margin-top: 64px;
+                max-width: 800px;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .banner-i_Yh8o {
+                padding-inline: 32px;
+                padding-top: 54px;
+                padding-bottom: 120px;
+            }
+
+            .heroImage-rpOmws {
+                margin-top: 80px;
+                max-width: 1000px;
+            }
+        }
+
+        @media (max-width: 1080px) {
+            .banner-i_Yh8o {
+                padding-inline: 16px;
+            }
+
+            .title-uqzzX8 {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .content-Zb4JPH {
+                gap: 32px;
+                margin-top: 72px;
+            }
+
+            .bannerLogo-UMdfCG {
+                font-size: 1.6rem;
+            }
+
+            .title-uqzzX8 {
+                font-size: clamp(2.5rem, 12vw, 3.6rem);
+            }
+
+            .subtitle-fKoPka {
+                font-size: 0.98rem;
+                line-height: 1.85;
+            }
+
+            .ctaButton-zsPMZb {
+                width: 100%;
+                max-width: 343px;
+            }
+
+            .eventTime-byby0q {
+                white-space: normal;
+            }
+        }
+    </style>
+    <script>
+        window.ABSTRACT_JAM_SIGNUP_URL = 'https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd';
+    </script>
+</head>
+
+<body>
+    <div class="custom-cursor" id="cursor"></div>
+    <div class="custom-cursor-dot" id="cursorDot"></div>
+    <div class="glow-orb glow-orb--1"></div>
+    <div class="glow-orb glow-orb--2"></div>
+    <div class="glow-orb glow-orb--3"></div>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="main-wrapper">
+        <nav class="navbar" id="navbar">
+            <a href="#" class="navbar__logo"><span class="navbar__logo-icon">Λ</span>ABSTRACT JAM</a>
+            <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="navbar__cta clickable" target="_blank" rel="noopener noreferrer">立即报名</a>
+        </nav>
+
+        <section class="banner-i_Yh8o" id="hero">
+            <div class="content-Zb4JPH">
+                <div class="brandTag-P_NYF_">
+                    <div class="bannerLogo-UMdfCG">ABSTRACT JAM</div>
+                </div>
+                <h1 class="title-uqzzX8">
+                    <span class="title-line">Vibe Coding</span>
+                    <span class="title-line">抽象创作大赛</span>
+                </h1>
+                <div class="subtitle-fKoPka">
+                    <p>
+                        <span class="subtitle-line">带着你"抽象"的想法或产品 Demo，</span>
+                        <span class="subtitle-line">赢奖金、见投资人，你的创意，不该死在校园里。</span>
+                    </p>
+                </div>
+                <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="ctaButton-zsPMZb clickable" target="_blank" rel="noopener noreferrer">立即报名</a>
+                <div class="eventTime-byby0q">2026.4.30-2026.5.25</div>
+            </div>
+            <div class="heroImage-rpOmws" aria-hidden="true">
+                <img src="https://lf-cdn.trae.com.cn/obj/trae-com-cn/trae_website_prod_cn/static/image/banner.e89dee89.png"
+                    alt="">
+            </div>
+        </section>
+
+        <section class="section" id="about">
+            <div class="section-header reveal">
+                <span class="section-header__label">关于大赛</span>
+                <h2 class="section-header__title">名为「抽象」，实为创新</h2>
+                <p class="section-header__desc">我们不是在办一场传统的创业大赛，而是搭一座桥——让最有创造力的年轻人直接链接最早期的钱。</p>
+            </div>
+            <div class="about-copy reveal">
+                <p>ABSTRACT JAM 不是一场传统的创业比赛，它更像一个把年轻创意、产品原型和早期机会直接连接起来的入口。我们不看成熟的商业包装，只看你的想法是不是够有新意、够好玩、或者够让人想分享。无论你的项目是一个还粗糙的 Demo，还是一个让人眼前一亮的概念，这里都适合你。</p>
+            </div>
+        </section>
+
+        <section class="section" id="prizes">
+            <div class="section-header reveal"><span class="section-header__label">赛事奖项</span>
+                <h2 class="section-header__title">不止是比赛，更是商业起点</h2>
+                <p class="section-header__desc">资金奖励 + 投资机会 + 商业孵化，三位一体。</p>
+            </div>
+            <div class="prizes-grid">
+                <div class="prize-card reveal">
+                    <div class="prize-card__label">脑洞大开奖 ×1</div>
+                    <ul class="prize-card__list">
+                        <li>现金奖励 ¥300</li>
+                        <li>投资人1v1交流</li>
+                        <li>官方获奖证书</li>
+                    </ul>
+                </div>
+                <div class="prize-card prize-card--featured reveal">
+                    <div class="prize-card__label">抽象之王 ×1</div>
+                    <ul class="prize-card__list">
+                        <li>现金奖励 ¥500</li>
+                        <li>顶级VC直推路演</li>
+                        <li>3个月商业孵化</li>
+                        <li>技术资源全面支持</li>
+                        <li>媒体曝光推广</li>
+                    </ul>
+                </div>
+                <div class="prize-card reveal">
+                    <div class="prize-card__label">最佳Vibe奖 ×4</div>
+                    <ul class="prize-card__list">
+                        <li>现金奖励 ¥100</li>
+                        <li>投资人交流机会</li>
+                        <li>官方获奖证书</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section section--dual">
+            <div class="section-panel" id="vibe-coding">
+                <div class="section-panel__inner">
+                    <div class="section-header reveal">
+                        <span class="section-header__label">参赛工具</span>
+                        <h2 class="section-header__title">Vibe Coding：工具不限</h2>
+                        <p class="section-header__desc">
+                            本次参赛支持任意 AI 编程或创作工具。你可以使用 Claude Code、Codex、Cursor、Windsurf、Copilot 等，也可以使用任何你熟悉的工具组合完成创作。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-panel" id="submission">
+                <div class="section-panel__inner">
+                    <div class="section-header reveal">
+                        <span class="section-header__label">参赛方式</span>
+                        <h2 class="section-header__title">纯线上提交</h2>
+                        <p class="section-header__desc">材料不复杂，重点是把你的创意说清楚、展示出来。</p>
+                    </div>
+                    <div class="submit-grid reveal">
+                        <div class="submit-card">
+                            <h3 class="submit-card__title">200字简介</h3>
+                            <p class="submit-card__desc">你的项目是什么，解决什么问题，为什么值得被看见。</p>
+                            <div class="submit-card__badge">必交</div>
+                        </div>
+                        <div class="submit-card">
+                            <h3 class="submit-card__title">任意形式 Demo</h3>
+                            <p class="submit-card__desc">链接、视频、Figma、原型页或录屏都可以，能讲清楚就行。</p>
+                            <div class="submit-card__badge">建议提交</div>
+                        </div>
+                    </div>
+                    <p class="section-panel-note reveal">所有材料均通过线上表单提交，无需线下到场。报名成功后，我们会发送详细提交指引。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="timeline">
+            <div class="section-header reveal"><span class="section-header__label">赛事日程</span>
+                <h2 class="section-header__title">关键时间节点</h2>
+            </div>
+            <div class="timeline reveal">
+                <div class="timeline__item">
+                    <div class="timeline__item-date">2026.04.30</div>
+                    <div class="timeline__item-title">报名通道开启</div>
+                    <div class="timeline__item-desc">提交你的初步idea，先占个坑</div>
+                </div>
+                <div class="timeline__item">
+                    <div class="timeline__item-date">2026.05.07</div>
+                    <div class="timeline__item-title">线上开幕 & 组队匹配</div>
+                    <div class="timeline__item-desc">找不到队友？我们帮你匹配</div>
+                </div>
+                <div class="timeline__item">
+                    <div class="timeline__item-date">2026.05.07 – 05.17</div>
+                    <div class="timeline__item-title">Vibe Coding 创作期</div>
+                    <div class="timeline__item-desc">10 天时间，用AI工具把你的想法变成产品。5月17日23:59前提交作品（Demo + 简介）</div>
+                </div>
+                <div class="timeline__item">
+                    <div class="timeline__item-date">2026.05.25</div>
+                    <div class="timeline__item-title">Demo Day 路演</div>
+                    <div class="timeline__item-desc">面向投资人展示，现场评奖</div>
+                </div>
+                <div class="timeline__item">
+                    <div class="timeline__item-date">2026.06 – 持续</div>
+                    <div class="timeline__item-title">商业孵化 & 投资对接</div>
+                    <div class="timeline__item-desc">优质项目进入孵化通道</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="faq">
+            <div class="section-header reveal"><span class="section-header__label">FAQ</span>
+                <h2 class="section-header__title">你可能想问</h2>
+            </div>
+            <div class="faq-list reveal">
+                <div class="faq-item"><button class="faq-item__question clickable">完全不会编程可以参加吗？<span
+                            class="faq-item__arrow">▼</span></button>
+                    <div class="faq-item__answer">当然可以！这正是Vibe
+                        Coding的意义所在。只要你有一个清晰的想法，用AI工具就能生成产品原型。我们看重的是<strong>创意的价值</strong>，而不是代码行数。</div>
+                </div>
+                <div class="faq-item"><button class="faq-item__question clickable">团队参赛还是个人参赛？<span
+                            class="faq-item__arrow">▼</span></button>
+                    <div class="faq-item__answer">都可以！个人或团队（不超过5人）均可。开幕时提供<strong>组队匹配</strong>环节。</div>
+                </div>
+                <div class="faq-item"><button class="faq-item__question clickable">项目必须是AI相关吗？<span
+                            class="faq-item__arrow">▼</span></button>
+                    <div class="faq-item__answer">不强制，但AI是当前最强的杠杆。任何<strong>新颖、有梗、有创意</strong>的项目都欢迎。</div>
+                </div>
+                <div class="faq-item"><button class="faq-item__question clickable">作品必须提交可运行的代码吗？<span
+                            class="faq-item__arrow">▼</span></button>
+                    <div class="faq-item__answer">
+                        不必。你可以提交<strong>可点击的在线Demo、视频演示、Figma原型或详细方案文档</strong>。只要能清晰展示你的创意即可。代码是加分项，但不是硬性要求。</div>
+                </div>
+                <div class="faq-item"><button class="faq-item__question clickable">投资人真的会看我的项目吗？<span
+                            class="faq-item__arrow">▼</span></button>
+                    <div class="faq-item__answer"><strong>会，而且不只「看」。</strong>合作投资机构承诺派出合伙人级别代表参与Demo
+                        Day评审。往届类似比赛已有项目<strong>当场获得TS</strong>。</div>
+                </div>
+                <div class="faq-item"><button class="faq-item__question clickable">传统创业比赛流程太繁琐，你们有什么不同？<span
+                            class="faq-item__arrow">▼</span></button>
+                    <div class="faq-item__answer">我们不要几十页商业计划书，不要多轮筛选。你只需要提交idea描述 +
+                        最终Demo。评委就是投资人本人，<strong>真实决策，真实给钱</strong>。</div>
+                </div>
+                <div class="faq-item"><button class="faq-item__question clickable">有报名费吗？<span
+                            class="faq-item__arrow">▼</span></button>
+                    <div class="faq-item__answer"><strong>完全免费。</strong>我们只希望最「抽象」的创意能涌现出来。</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="cta">
+            <div class="cta-banner reveal">
+                <h2 class="cta-banner__title">你的idea值一个亿</h2>
+                <p class="cta-banner__desc">别让你的天马行空只停留在脑海里。<br>用Vibe Coding把它变成现实，让投资人看见。</p><a
+                    class="btn btn--primary btn--glow clickable" id="ctaButton" href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" target="_blank" rel="noopener noreferrer">立即报名参赛</a>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 14px;">报名截止：2026年5月17日 · 名额有限</p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer__links"><a href="#about">关于大赛</a><a href="#prizes">赛事奖项</a><a
+                    href="#vibe-coding">参赛工具</a><a href="#submission">参赛方式</a><a href="#timeline">赛事日程</a><a href="#faq">FAQ</a></div>
+            <p>© 2026 ABSTRACT JAM · Vibe Coding 抽象创作大赛 · 让你的好想法被看见，被投资</p>
+        </footer>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal"><button class="modal__close clickable" id="modalClose">✕</button>
+            <div class="modal__title" id="modalTitle">报名参赛</div>
+            <form class="modal__form" id="modalForm"><input type="text" placeholder="你的名字 / 昵称" required><input
+                    type="email" placeholder="电子邮箱" required><textarea placeholder="用一句话描述你的idea（抽象一点也没关系）"
+                    required></textarea><button type="submit" class="btn btn--primary clickable">提交报名</button></form>
+            <div class="modal__success" id="modalSuccess"><span class="modal__success-emoji">🎉</span>
+                <p class="modal__success-text">报名成功！</p>
+                <p style="color: var(--text-secondary);">我们会在5个工作日内联系你，并发送作品提交指引。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [], mouseX = -1000, mouseY = -1000, canvasW, canvasH;
+
+        function resizeCanvas() {
+            canvasW = canvas.width = window.innerWidth;
+            canvasH = canvas.height = window.innerHeight;
+            const count = Math.min(Math.floor((canvasW * canvasH) / 8000), 180);
+            particles = [];
+            for (let i = 0; i < count; i++)
+                particles.push({
+                    x: Math.random() * canvasW, y: Math.random() * canvasH,
+                    vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+                    size: Math.random() * 1.8 + 0.6,
+                    opacity: Math.random() * 0.5 + 0.2,
+                    baseOpacity: Math.random() * 0.5 + 0.2
+                });
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvasW, canvasH);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < -20) p.x = canvasW + 20;
+                if (p.x > canvasW + 20) p.x = -20;
+                if (p.y < -20) p.y = canvasH + 20;
+                if (p.y > canvasH + 20) p.y = -20;
+                const dx = mouseX - p.x, dy = mouseY - p.y, dist = Math.hypot(dx, dy);
+                let op = p.baseOpacity;
+                if (dist < 140 && mouseX > -500) {
+                    const force = (1 - dist / 140) * 0.6;
+                    p.vx += dx * force * 0.002;
+                    p.vy += dy * force * 0.002;
+                    op = Math.min(p.baseOpacity + 0.35, 0.8);
+                }
+                p.vx *= 0.999; p.vy *= 0.999;
+                const spd = Math.hypot(p.vx, p.vy);
+                if (spd > 0.9) { p.vx = (p.vx / spd) * 0.9; p.vy = (p.vy / spd) * 0.9; }
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(180,170,220,${op})`; ctx.fill();
+            });
+            for (let i = 0; i < particles.length; i++)
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.hypot(dx, dy);
+                    if (dist < 100) {
+                        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(140,130,200,${0.06 * (1 - dist / 100)})`; ctx.lineWidth = 0.5; ctx.stroke();
+                    }
+                }
+            requestAnimationFrame(animateParticles);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+        window.addEventListener('mouseleave', () => { mouseX = -1000; mouseY = -1000; });
+        resizeCanvas(); animateParticles();
+
+        const cursor = document.getElementById('cursor'), cursorDot = document.getElementById('cursorDot');
+        let cx = 0, cy = 0, dx = 0, dy = 0;
+        document.addEventListener('mousemove', e => { cx = e.clientX; cy = e.clientY; });
+        function animateCursor() {
+            dx += (cx - dx) * 0.35; dy += (cy - dy) * 0.35;
+            cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px';
+            cursorDot.style.left = dx + 'px'; cursorDot.style.top = dy + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+        document.querySelectorAll('a,button,.clickable,.card-interactive,input,textarea,.btn').forEach(el => {
+            el.addEventListener('mouseenter', () => { cursor.classList.add('hovering'); cursorDot.classList.add('hovering'); });
+            el.addEventListener('mouseleave', () => { cursor.classList.remove('hovering'); cursorDot.classList.remove('hovering'); });
+        });
+
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => { window.scrollY > 60 ? navbar.classList.add('scrolled') : navbar.classList.remove('scrolled'); });
+        const observer = new IntersectionObserver(entries => entries.forEach(e => e.isIntersecting && e.target.classList.add('visible')), { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.querySelector('.faq-item__question').addEventListener('click', () => {
+                const open = item.classList.contains('open');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                if (!open) item.classList.add('open');
+            });
+        });
+        const modalOverlay = document.getElementById('modalOverlay'), modalClose = document.getElementById('modalClose'),
+            modalForm = document.getElementById('modalForm'), modalSuccess = document.getElementById('modalSuccess'),
+            modalTitle = document.getElementById('modalTitle'), ctaButton = document.getElementById('ctaButton'),
+            navbarCta = document.querySelector('.navbar__cta');
+        function openModal() {
+            modalOverlay.classList.add('active'); modalForm.style.display = 'flex';
+            modalSuccess.classList.remove('show'); modalTitle.textContent = '报名参赛';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            modalOverlay.classList.remove('active'); document.body.style.overflow = '';
+            setTimeout(() => { modalForm.reset(); modalForm.style.display = 'flex'; modalSuccess.classList.remove('show'); modalTitle.textContent = '报名参赛'; }, 400);
+        }
+        ctaButton.addEventListener('click', e => {
+            e.preventDefault();
+            window.open(window.ABSTRACT_JAM_SIGNUP_URL, '_blank', 'noopener,noreferrer');
+        });
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeModal(); });
+        modalForm.addEventListener('submit', e => {
+            e.preventDefault(); modalForm.style.display = 'none'; modalSuccess.classList.add('show');
+            modalTitle.textContent = '🎉 报名成功'; setTimeout(closeModal, 3500);
+        });
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === '#') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+                const target = document.querySelector(href);
+                if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            });
+        });
+        console.log('%c 🎨 ABSTRACT JAM 2026 %c 落地页已就绪 · 让好想法被看见，被投资',
+            'background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;padding:8px 16px;border-radius:6px;font-weight:bold;', 'color:#a0a0b8;');
+    </script>
+</body>
+
+</html>

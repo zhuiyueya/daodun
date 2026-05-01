@@ -111,17 +111,7 @@ describe('App', () => {
     window.location.hash = '#/'
     render(<App />)
 
-    expect(
-      screen.getByRole('heading', {
-        name: '首届刀盾杯・大学生赛博整活大赛',
-        level: 1,
-      }),
-    ).toBeInTheDocument()
-    expect(screen.getByLabelText('报名截止倒计时数值')).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: '奖金设置与部分奖品参考', level: 2 }),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '作品广场' })).toBeInTheDocument()
+    expect(screen.getByTitle('ABSTRACT JAM 2026 报名页')).toBeInTheDocument()
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith('/api/me', expect.anything())
