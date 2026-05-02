@@ -85,6 +85,7 @@ async function proxyToExternalSignService(endpoint: string, url: string) {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        accept: 'application/json',
       },
       body: JSON.stringify({ url }),
     })
@@ -93,6 +94,7 @@ async function proxyToExternalSignService(endpoint: string, url: string) {
   }
 
   const text = await response.text()
+  const contentType = response.headers.get('content-type') ?? 'unknown'
   let data: {
     appId?: string
     timestamp?: number
@@ -104,7 +106,11 @@ async function proxyToExternalSignService(endpoint: string, url: string) {
   try {
     data = text ? (JSON.parse(text) as typeof data) : {}
   } catch {
-    throw new HttpError(502, '外部微信签名服务返回了非法响应')
+    const snippet = text.replace(/\s+/g, ' ').slice(0, 180)
+    throw new HttpError(
+      502,
+      `外部微信签名服务返回了非法响应（status=${response.status}, content-type=${contentType}, body=${snippet || 'empty'}）`,
+    )
   }
 
   if (!response.ok) {
