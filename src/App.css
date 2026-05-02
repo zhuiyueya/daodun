@@ -21,6 +21,57 @@
   background: #06060d;
 }
 
+.share-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 1200;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(139, 92, 246, 0.42);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.94), rgba(236, 72, 153, 0.94));
+  color: #fff;
+  box-shadow: 0 18px 42px rgba(139, 92, 246, 0.34);
+  cursor: pointer;
+}
+
+.share-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(6, 6, 13, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.share-dialog {
+  width: min(100%, 360px);
+  display: grid;
+  gap: 14px;
+  padding: 28px 24px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(17, 17, 37, 0.98), rgba(13, 13, 26, 0.98)),
+    var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.share-dialog h2 {
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+}
+
+.share-copy {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 .brand,
 .secondary-link {
   color: var(--heading);

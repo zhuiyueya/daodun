@@ -11,6 +11,7 @@ import {
   fetchPendingWorks,
   fetchWork,
   fetchWorks,
+  fetchWechatJssdkSignature,
   fetchMyWorks,
   logout,
   rejectWork,
@@ -19,6 +20,13 @@ import {
   uploadImage,
   verifyCode,
 } from './lib/api'
+import {
+  applyWechatShareData,
+  buildWechatShareData,
+  getWechatSignatureUrl,
+  isWeChatBrowser,
+  loadWechatSdk,
+} from './lib/wechat'
 import type { PlatformType, PublicWork, SessionUser, Track } from './types'
 const TITLE_MAX = 30
 const DESCRIPTION_MAX = 1200
@@ -1068,6 +1076,8 @@ function App() {
   const [currentPage, setCurrentPage] = useState<CurrentPage>(() => getCurrentPage())
   const [activeFilter, setActiveFilter] = useState<GalleryFilter>('all')
   const [notice, setNotice] = useState('')
+  const [wechatReady, setWechatReady] = useState(false)
+  const [shareHintOpen, setShareHintOpen] = useState(false)
   const [me, setMe] = useState<SessionUser | null>(null)
   const [liveWorks, setLiveWorks] = useState<PublicWork[]>([])
   const [detailWork, setDetailWork] = useState<PublicWork | null>(null)
@@ -1080,6 +1090,7 @@ function App() {
     my: false,
     admin: false,
   })
+  const isWechatClient = isWeChatBrowser(window.navigator.userAgent)
 
   useEffect(() => {
     const syncPage = () => {
@@ -1096,6 +1107,51 @@ function App() {
   useEffect(() => {
     void refreshMe()
   }, [])
+
+  useEffect(() => {
+    if (!isWechatClient) {
+      return
+    }
+
+    let disposed = false
+
+    async function initWechatShare() {
+      try {
+        const wx = await loadWechatSdk()
+        const signature = await fetchWechatJssdkSignature(getWechatSignatureUrl(window.location.href))
+
+        wx.config({
+          appId: signature.appId,
+          timestamp: signature.timestamp,
+          nonceStr: signature.nonceStr,
+          signature: signature.signature,
+          jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData'],
+        })
+
+        wx.ready(() => {
+          if (!disposed) {
+            setWechatReady(true)
+          }
+        })
+
+        wx.error((error) => {
+          console.error('WeChat JSSDK config failed', error)
+
+          if (!disposed) {
+            setWechatReady(false)
+          }
+        })
+      } catch (error) {
+        console.error('WeChat JSSDK init failed', error)
+      }
+    }
+
+    void initWechatShare()
+
+    return () => {
+      disposed = true
+    }
+  }, [isWechatClient])
 
   useEffect(() => {
     if (currentPage.page === 'detail') {
@@ -1254,6 +1310,30 @@ function App() {
     return work.track === activeFilter
   })
   const currentDetail = detailWork
+  const currentShareWork =
+    currentPage.page === 'detail' && currentDetail?.id === currentPage.workId ? currentDetail : null
+  const canShowShareButton =
+    isWechatClient &&
+    (currentPage.page === 'home' || currentPage.page === 'gallery' || currentPage.page === 'detail')
+
+  useEffect(() => {
+    if (!isWechatClient || !wechatReady || !window.wx) {
+      return
+    }
+
+    const shareData = buildWechatShareData({
+      currentUrl: window.location.href,
+      page:
+        currentPage.page === 'home'
+          ? 'home'
+          : currentPage.page === 'detail' && currentShareWork
+            ? 'detail'
+            : 'default',
+      work: currentShareWork,
+    })
+
+    applyWechatShareData(window.wx, shareData)
+  }, [currentPage.page, currentShareWork, isWechatClient, wechatReady])
 
   return (
     <main className={currentPage.page === 'home' ? 'page-shell page-shell--home' : 'page-shell'}>
@@ -1419,6 +1499,39 @@ function App() {
         ) : (
           <AdminPage me={me} works={adminWorks} onApprove={handleApprove} onReject={handleReject} />
         )
+      ) : null}
+
+      {canShowShareButton ? (
+        <>
+          <button
+            className="share-fab"
+            type="button"
+            onClick={() => setShareHintOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={shareHintOpen}
+          >
+            分享
+          </button>
+
+          {shareHintOpen ? (
+            <div
+              className="share-overlay"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="share-dialog-title"
+              onClick={() => setShareHintOpen(false)}
+            >
+              <div className="share-dialog" onClick={(event) => event.stopPropagation()}>
+                <p className="eyebrow">微信分享</p>
+                <h2 id="share-dialog-title">点击右上角完成分享</h2>
+                <p className="share-copy">发送给朋友，或分享到朋友圈，让更多人看到这个比赛和作品。</p>
+                <button className="ghost-button" type="button" onClick={() => setShareHintOpen(false)}>
+                  我知道了
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </>
       ) : null}
 
       {currentPage.page === 'home' ? null : (

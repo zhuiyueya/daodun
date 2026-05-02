@@ -35,6 +35,31 @@ async function request<T>(input: string, init?: RequestInit) {
   return data
 }
 
+async function requestAbsolute<T>(input: string, init?: RequestInit) {
+  let response: Response
+
+  try {
+    response = await fetch(input, {
+      headers: {
+        'content-type': 'application/json',
+        ...(init?.headers ?? {}),
+      },
+      ...init,
+    })
+  } catch {
+    throw new ApiError(0, '外部签名服务请求失败：请检查微信签名服务是否可用')
+  }
+
+  const text = await response.text()
+  const data = text ? (JSON.parse(text) as T & { error?: string }) : ({} as T & { error?: string })
+
+  if (!response.ok) {
+    throw new ApiError(response.status, data.error ?? '请求失败')
+  }
+
+  return data
+}
+
 export async function fetchMe() {
   return request<{ user: SessionUser | null }>('/api/me', {
     headers: {},
@@ -186,6 +211,32 @@ export async function deleteWork(id: string) {
   return request<{ ok: boolean }>(`/api/works/${id}`, {
     method: 'DELETE',
     body: JSON.stringify({}),
+  })
+}
+
+export async function fetchWechatJssdkSignature(url: string) {
+  const externalEndpoint = import.meta.env.VITE_WECHAT_SIGN_SERVICE_URL?.trim()
+
+  if (externalEndpoint) {
+    return requestAbsolute<{
+      appId: string
+      timestamp: number
+      nonceStr: string
+      signature: string
+    }>(externalEndpoint, {
+      method: 'POST',
+      body: JSON.stringify({ url }),
+    })
+  }
+
+  return request<{
+    appId: string
+    timestamp: number
+    nonceStr: string
+    signature: string
+  }>('/api/wechat/jssdk-sign', {
+    method: 'POST',
+    body: JSON.stringify({ url }),
   })
 }
 

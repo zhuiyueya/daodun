@@ -1,5 +1,8 @@
 export interface Env {
   DB: D1Database
+  WECHAT_APP_ID: string
+  WECHAT_APP_SECRET: string
+  WECHAT_SIGN_SERVICE_URL?: string
   ALIYUN_ACCESS_KEY_ID: string
   ALIYUN_ACCESS_KEY_SECRET: string
   OSS_BUCKET: string
