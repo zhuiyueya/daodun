@@ -42,6 +42,18 @@ export interface WechatSdk {
       fail?: (error: unknown) => void
     },
   ) => void
+  onMenuShareAppMessage?: (
+    data: WechatSharePayload & {
+      success?: () => void
+      fail?: (error: unknown) => void
+    },
+  ) => void
+  onMenuShareTimeline?: (
+    data: WechatSharePayload & {
+      success?: () => void
+      fail?: (error: unknown) => void
+    },
+  ) => void
 }
 
 declare global {
@@ -142,7 +154,29 @@ export function loadWechatSdk() {
   return wechatSdkLoader
 }
 
-export function applyWechatShareData(wx: WechatSdk, shareData: WechatShareData) {
-  wx.updateAppMessageShareData(shareData.friend)
-  wx.updateTimelineShareData(shareData.timeline)
+export function applyWechatShareData(
+  wx: WechatSdk,
+  shareData: WechatShareData,
+  hooks?: {
+    onFriendSuccess?: () => void
+    onFriendFail?: (error: unknown) => void
+    onTimelineSuccess?: () => void
+    onTimelineFail?: (error: unknown) => void
+  },
+) {
+  const friendPayload = {
+    ...shareData.friend,
+    success: hooks?.onFriendSuccess,
+    fail: hooks?.onFriendFail,
+  }
+  const timelinePayload = {
+    ...shareData.timeline,
+    success: hooks?.onTimelineSuccess,
+    fail: hooks?.onTimelineFail,
+  }
+
+  wx.updateAppMessageShareData(friendPayload)
+  wx.updateTimelineShareData(timelinePayload)
+  wx.onMenuShareAppMessage?.(friendPayload)
+  wx.onMenuShareTimeline?.(timelinePayload)
 }
