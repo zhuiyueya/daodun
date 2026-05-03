@@ -338,12 +338,12 @@ function SubmitPage({
     }
 
     if (authorLength === 0) {
-      onNotice('请填写作者名称')
+      onNotice('请填写群昵称')
       return
     }
 
     if (authorTooLong) {
-      onNotice(`作者名称不能超过 ${AUTHOR_MAX} 个字`)
+      onNotice(`群昵称不能超过 ${AUTHOR_MAX} 个字`)
       return
     }
 
@@ -487,7 +487,7 @@ function SubmitPage({
         </label>
 
         <label className="field">
-          <span>作者名称</span>
+          <span>群昵称</span>
           <input
             value={authorName}
             onChange={(event) => setAuthorName(event.target.value)}
@@ -674,12 +674,12 @@ function EditWorkPage({
     }
 
     if (!authorName.trim()) {
-      onNotice('请填写作者名称')
+      onNotice('请填写群昵称')
       return
     }
 
     if (authorLength > AUTHOR_MAX) {
-      onNotice(`作者名称不能超过 ${AUTHOR_MAX} 个字`)
+      onNotice(`群昵称不能超过 ${AUTHOR_MAX} 个字`)
       return
     }
 
@@ -785,7 +785,7 @@ function EditWorkPage({
         <div className="section-heading">
           <p className="eyebrow">编辑作品</p>
           <h1 id="edit-title">修改后将重新进入审核</h1>
-          <p className="helper-text">字数限制：标题 1-30 字，作品说明 1-1200 字，作者名称 1-15 字。</p>
+          <p className="helper-text">字数限制：标题 1-30 字，作品说明 1-1200 字，群昵称 1-15 字。</p>
         </div>
 
         <label className="field">
@@ -806,7 +806,7 @@ function EditWorkPage({
         </label>
 
         <label className="field">
-          <span>作者名称</span>
+          <span>群昵称</span>
           <input value={authorName} onChange={(event) => setAuthorName(event.target.value)} maxLength={AUTHOR_MAX} />
           <small className="field-counter">{authorLength}/{AUTHOR_MAX}</small>
         </label>
@@ -1040,7 +1040,7 @@ function AdminPage({
               {work.coverImageUrl ? <img className="work-cover" src={work.coverImageUrl} alt={`${work.title} 封面图`} /> : null}
               <h3>{work.title}</h3>
               <p>{getGalleryDescription(work.description)}</p>
-              <p className="meta-text">作者：{work.authorName}</p>
+              <p className="meta-text">群昵称：{work.authorName}</p>
               <p className="meta-text">邮箱：{work.ownerEmail}</p>
               <div className="card-actions">
                 <button className="ghost-button" type="button" onClick={() => void onApprove(work.id)}>
@@ -1412,7 +1412,7 @@ function App() {
               <h1 id="detail-title">{currentDetail.title}</h1>
               <div className="detail-info">
                 <div>
-                  <span className="detail-label">作者</span>
+                  <span className="detail-label">群昵称</span>
                   <p>{currentDetail.authorName}</p>
                 </div>
                 {currentDetail.externalUrl ? (

@@ -109,7 +109,7 @@ export const onRequestPost: PagesFunction = async (context) =>
     }
 
     if (!authorName || authorName.length > 15) {
-      throw new HttpError(400, '作者名称不能为空且不能超过 15 个字')
+      throw new HttpError(400, '群昵称不能为空且不能超过 15 个字')
     }
 
     if (!allowedPlatformTypes.includes(platformType)) {
