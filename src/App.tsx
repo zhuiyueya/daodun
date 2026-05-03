@@ -1078,19 +1078,6 @@ function App() {
   const [notice, setNotice] = useState('')
   const [wechatReady, setWechatReady] = useState(false)
   const [shareHintOpen, setShareHintOpen] = useState(false)
-  const [wechatDebug, setWechatDebug] = useState<{
-    init: string
-    signature: string
-    config: string
-    share: string
-    error: string
-  }>({
-    init: 'idle',
-    signature: 'idle',
-    config: 'idle',
-    share: 'idle',
-    error: '',
-  })
   const [me, setMe] = useState<SessionUser | null>(null)
   const [liveWorks, setLiveWorks] = useState<PublicWork[]>([])
   const [detailWork, setDetailWork] = useState<PublicWork | null>(null)
@@ -1130,22 +1117,8 @@ function App() {
 
     async function initWechatShare() {
       try {
-        if (!disposed) {
-          setWechatDebug((prev) => ({ ...prev, init: 'loading sdk', error: '' }))
-        }
-
         const wx = await loadWechatSdk()
-        if (!disposed) {
-          setWechatDebug((prev) => ({ ...prev, init: 'sdk loaded', signature: 'requesting' }))
-        }
         const signature = await fetchWechatJssdkSignature(getWechatSignatureUrl(window.location.href))
-        if (!disposed) {
-          setWechatDebug((prev) => ({
-            ...prev,
-            signature: `ok ${signature.timestamp}`,
-            config: 'configuring',
-          }))
-        }
 
         wx.config({
           appId: signature.appId,
@@ -1163,7 +1136,6 @@ function App() {
         wx.ready(() => {
           if (!disposed) {
             setWechatReady(true)
-            setWechatDebug((prev) => ({ ...prev, config: 'ready' }))
           }
         })
 
@@ -1172,22 +1144,10 @@ function App() {
 
           if (!disposed) {
             setWechatReady(false)
-            setWechatDebug((prev) => ({
-              ...prev,
-              config: 'error',
-              error: error instanceof Error ? error.message : JSON.stringify(error),
-            }))
           }
         })
       } catch (error) {
         console.error('WeChat JSSDK init failed', error)
-        if (!disposed) {
-          setWechatDebug((prev) => ({
-            ...prev,
-            init: 'error',
-            error: error instanceof Error ? error.message : String(error),
-          }))
-        }
       }
     }
 
@@ -1360,12 +1320,6 @@ function App() {
   const canShowShareButton =
     isWechatClient &&
     (currentPage.page === 'home' || currentPage.page === 'gallery' || currentPage.page === 'detail')
-  const currentShareScene =
-    currentPage.page === 'home'
-      ? 'home'
-      : currentPage.page === 'detail' && currentShareWork
-        ? `detail:${currentShareWork.id}`
-        : currentPage.page
 
   useEffect(() => {
     if (!isWechatClient || !wechatReady || !window.wx) {
@@ -1383,29 +1337,7 @@ function App() {
       work: currentShareWork,
     })
 
-    setWechatDebug((prev) => ({ ...prev, share: `applying ${currentShareScene}` }))
-    applyWechatShareData(window.wx, shareData, {
-      onFriendSuccess: () => {
-        setWechatDebug((prev) => ({ ...prev, share: `friend ready ${currentShareScene}` }))
-      },
-      onFriendFail: (error) => {
-        setWechatDebug((prev) => ({
-          ...prev,
-          share: 'friend fail',
-          error: error instanceof Error ? error.message : JSON.stringify(error),
-        }))
-      },
-      onTimelineSuccess: () => {
-        setWechatDebug((prev) => ({ ...prev, share: `timeline ready ${currentShareScene}` }))
-      },
-      onTimelineFail: (error) => {
-        setWechatDebug((prev) => ({
-          ...prev,
-          share: 'timeline fail',
-          error: error instanceof Error ? error.message : JSON.stringify(error),
-        }))
-      },
-    })
+    applyWechatShareData(window.wx, shareData)
   }, [currentPage.page, currentShareWork, isWechatClient, wechatReady])
 
   return (
@@ -1576,16 +1508,6 @@ function App() {
 
       {canShowShareButton ? (
         <>
-          <section className="wechat-debug-panel" aria-label="微信分享调试状态">
-            <p><strong>微信环境</strong> {isWechatClient ? 'yes' : 'no'}</p>
-            <p><strong>场景</strong> {currentShareScene}</p>
-            <p><strong>SDK</strong> {wechatDebug.init}</p>
-            <p><strong>签名</strong> {wechatDebug.signature}</p>
-            <p><strong>配置</strong> {wechatDebug.config}</p>
-            <p><strong>分享</strong> {wechatDebug.share}</p>
-            {wechatDebug.error ? <p><strong>错误</strong> {wechatDebug.error}</p> : null}
-          </section>
-
           <button
             className="share-fab"
             type="button"
