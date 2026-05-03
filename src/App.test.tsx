@@ -111,7 +111,12 @@ describe('App', () => {
     window.location.hash = '#/'
     render(<App />)
 
-    expect(screen.getByTitle('ABSTRACT JAM 2026 报名页')).toBeInTheDocument()
+    expect(screen.queryByTitle('ABSTRACT JAM 2026 报名页')).not.toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(document.querySelector('.landing-page-shell .main-wrapper')).toBeInTheDocument()
+      expect(document.body).toHaveClass('app-body--home')
+    })
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith('/api/me', expect.anything())

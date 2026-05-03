@@ -11,14 +11,7 @@
 
 .landing-page-shell {
   min-height: 100vh;
-}
-
-.landing-page-frame {
-  display: block;
   width: 100%;
-  min-height: 100vh;
-  border: 0;
-  background: #06060d;
 }
 
 .share-fab {

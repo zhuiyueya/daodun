@@ -61,10 +61,20 @@ body::before {
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 92%);
 }
 
+body.app-body--home::before {
+  display: none;
+}
+
 #root {
   width: min(1160px, calc(100% - 24px));
   margin: 0 auto;
   padding: 24px 0 56px;
+}
+
+#root.app-root--home {
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 a,

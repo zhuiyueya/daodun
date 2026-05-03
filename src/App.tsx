@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import './App.css'
 import landingPageHtml from '../index 2.html?raw'
@@ -138,14 +138,384 @@ const homeLandingPageHtml = landingPageHtml
   )
 
 function HomePage() {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+
+    if (!container) {
+      return
+    }
+
+    const parser = new DOMParser()
+    const documentTree = parser.parseFromString(homeLandingPageHtml, 'text/html')
+    const managedHeadNodes: HTMLElement[] = []
+
+    for (const child of Array.from(documentTree.head.children)) {
+      if (child.tagName === 'TITLE' || child.tagName === 'META') {
+        continue
+      }
+
+      const clonedNode = child.cloneNode(true) as HTMLElement
+      clonedNode.setAttribute('data-landing-page-head', 'true')
+      document.head.appendChild(clonedNode)
+      managedHeadNodes.push(clonedNode)
+    }
+
+    container.innerHTML = documentTree.body.innerHTML
+
+    const cleanupTasks: Array<() => void> = []
+
+    if (typeof IntersectionObserver === 'undefined') {
+      container.querySelectorAll('.reveal').forEach((element) => element.classList.add('visible'))
+    } else {
+      const revealObserver = new IntersectionObserver(
+        (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('visible')),
+        { threshold: 0.12 },
+      )
+
+      cleanupTasks.push(() => revealObserver.disconnect())
+      container.querySelectorAll('.reveal').forEach((element) => revealObserver.observe(element))
+    }
+
+    const navbar = container.querySelector<HTMLElement>('#navbar')
+
+    if (navbar) {
+      const syncNavbarState = () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 60)
+      }
+
+      syncNavbarState()
+      window.addEventListener('scroll', syncNavbarState, { passive: true })
+      cleanupTasks.push(() => window.removeEventListener('scroll', syncNavbarState))
+    }
+
+    const faqItems = Array.from(container.querySelectorAll<HTMLElement>('.faq-item'))
+    const faqCleanup = faqItems.map((item) => {
+      const question = item.querySelector<HTMLElement>('.faq-item__question')
+
+      if (!question) {
+        return () => {}
+      }
+
+      const handleClick = () => {
+        const open = item.classList.contains('open')
+        faqItems.forEach((faqItem) => faqItem.classList.remove('open'))
+
+        if (!open) {
+          item.classList.add('open')
+        }
+      }
+
+      question.addEventListener('click', handleClick)
+
+      return () => question.removeEventListener('click', handleClick)
+    })
+
+    cleanupTasks.push(...faqCleanup)
+
+    const signupUrl =
+      'https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd'
+    const ctaButton = container.querySelector<HTMLAnchorElement>('#ctaButton')
+
+    if (ctaButton) {
+      const handleSignupClick = (event: MouseEvent) => {
+        event.preventDefault()
+        window.open(signupUrl, '_blank', 'noopener,noreferrer')
+      }
+
+      ctaButton.addEventListener('click', handleSignupClick)
+      cleanupTasks.push(() => ctaButton.removeEventListener('click', handleSignupClick))
+    }
+
+    const modalOverlay = container.querySelector<HTMLElement>('#modalOverlay')
+    const modalClose = container.querySelector<HTMLElement>('#modalClose')
+    const modalForm = container.querySelector<HTMLFormElement>('#modalForm')
+    const modalSuccess = container.querySelector<HTMLElement>('#modalSuccess')
+    const modalTitle = container.querySelector<HTMLElement>('#modalTitle')
+    let closeModalTimeoutId: number | null = null
+
+    const closeModal = () => {
+      if (!modalOverlay || !modalForm || !modalSuccess || !modalTitle) {
+        return
+      }
+
+      modalOverlay.classList.remove('active')
+      document.body.style.overflow = ''
+
+      closeModalTimeoutId = window.setTimeout(() => {
+        modalForm.reset()
+        modalForm.style.display = 'flex'
+        modalSuccess.classList.remove('show')
+        modalTitle.textContent = '报名参赛'
+      }, 400)
+    }
+
+    if (modalClose) {
+      modalClose.addEventListener('click', closeModal)
+      cleanupTasks.push(() => modalClose.removeEventListener('click', closeModal))
+    }
+
+    if (modalOverlay) {
+      const handleOverlayClick = (event: MouseEvent) => {
+        if (event.target === modalOverlay) {
+          closeModal()
+        }
+      }
+
+      modalOverlay.addEventListener('click', handleOverlayClick)
+      cleanupTasks.push(() => modalOverlay.removeEventListener('click', handleOverlayClick))
+    }
+
+    if (modalForm && modalSuccess && modalTitle) {
+      const handleSubmit = (event: SubmitEvent) => {
+        event.preventDefault()
+        modalForm.style.display = 'none'
+        modalSuccess.classList.add('show')
+        modalTitle.textContent = '🎉 报名成功'
+        closeModalTimeoutId = window.setTimeout(closeModal, 3500)
+      }
+
+      modalForm.addEventListener('submit', handleSubmit)
+      cleanupTasks.push(() => modalForm.removeEventListener('submit', handleSubmit))
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && modalOverlay?.classList.contains('active')) {
+        closeModal()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    cleanupTasks.push(() => document.removeEventListener('keydown', handleEscape))
+
+    const anchorCleanups = Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')).map((anchor) => {
+      const handleAnchorClick = (event: MouseEvent) => {
+        const href = anchor.getAttribute('href')
+
+        if (href === '#') {
+          event.preventDefault()
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          return
+        }
+
+        if (!href) {
+          return
+        }
+
+        const target = container.querySelector<HTMLElement>(href)
+
+        if (target) {
+          event.preventDefault()
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }
+
+      anchor.addEventListener('click', handleAnchorClick)
+
+      return () => anchor.removeEventListener('click', handleAnchorClick)
+    })
+
+    cleanupTasks.push(...anchorCleanups)
+
+    const canvas = container.querySelector<HTMLCanvasElement>('#particleCanvas')
+
+    if (canvas) {
+      let ctx: CanvasRenderingContext2D | null = null
+
+      try {
+        ctx = canvas.getContext('2d')
+      } catch {
+        ctx = null
+      }
+
+      if (ctx) {
+        type Particle = {
+          x: number
+          y: number
+          vx: number
+          vy: number
+          size: number
+          baseOpacity: number
+        }
+
+        let particles: Particle[] = []
+        let mouseX = -1000
+        let mouseY = -1000
+        let canvasW = 0
+        let canvasH = 0
+        let particleAnimationId = 0
+
+        const resizeCanvas = () => {
+          canvasW = canvas.width = window.innerWidth
+          canvasH = canvas.height = window.innerHeight
+          const count = Math.min(Math.floor((canvasW * canvasH) / 8000), 180)
+          particles = Array.from({ length: count }, () => ({
+            x: Math.random() * canvasW,
+            y: Math.random() * canvasH,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            size: Math.random() * 1.8 + 0.6,
+            baseOpacity: Math.random() * 0.5 + 0.2,
+          }))
+        }
+
+        const handleMouseMove = (event: MouseEvent) => {
+          mouseX = event.clientX
+          mouseY = event.clientY
+        }
+
+        const handleMouseLeave = () => {
+          mouseX = -1000
+          mouseY = -1000
+        }
+
+        const animateParticles = () => {
+          ctx.clearRect(0, 0, canvasW, canvasH)
+
+          for (const particle of particles) {
+            particle.x += particle.vx
+            particle.y += particle.vy
+
+            if (particle.x < -20) particle.x = canvasW + 20
+            if (particle.x > canvasW + 20) particle.x = -20
+            if (particle.y < -20) particle.y = canvasH + 20
+            if (particle.y > canvasH + 20) particle.y = -20
+
+            const dx = mouseX - particle.x
+            const dy = mouseY - particle.y
+            const dist = Math.hypot(dx, dy)
+            let opacity = particle.baseOpacity
+
+            if (dist < 140 && mouseX > -500) {
+              const force = (1 - dist / 140) * 0.6
+              particle.vx += dx * force * 0.002
+              particle.vy += dy * force * 0.002
+              opacity = Math.min(particle.baseOpacity + 0.35, 0.8)
+            }
+
+            particle.vx *= 0.999
+            particle.vy *= 0.999
+
+            const speed = Math.hypot(particle.vx, particle.vy)
+
+            if (speed > 0.9) {
+              particle.vx = (particle.vx / speed) * 0.9
+              particle.vy = (particle.vy / speed) * 0.9
+            }
+
+            ctx.beginPath()
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(180,170,220,${opacity})`
+            ctx.fill()
+          }
+
+          for (let i = 0; i < particles.length; i += 1) {
+            for (let j = i + 1; j < particles.length; j += 1) {
+              const dx = particles[i].x - particles[j].x
+              const dy = particles[i].y - particles[j].y
+              const dist = Math.hypot(dx, dy)
+
+              if (dist < 100) {
+                ctx.beginPath()
+                ctx.moveTo(particles[i].x, particles[i].y)
+                ctx.lineTo(particles[j].x, particles[j].y)
+                ctx.strokeStyle = `rgba(140,130,200,${0.06 * (1 - dist / 100)})`
+                ctx.lineWidth = 0.5
+                ctx.stroke()
+              }
+            }
+          }
+
+          particleAnimationId = window.requestAnimationFrame(animateParticles)
+        }
+
+        window.addEventListener('resize', resizeCanvas)
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('mouseleave', handleMouseLeave)
+        resizeCanvas()
+        animateParticles()
+
+        cleanupTasks.push(() => {
+          window.cancelAnimationFrame(particleAnimationId)
+          window.removeEventListener('resize', resizeCanvas)
+          window.removeEventListener('mousemove', handleMouseMove)
+          window.removeEventListener('mouseleave', handleMouseLeave)
+        })
+      }
+    }
+
+    const cursor = container.querySelector<HTMLElement>('#cursor')
+    const cursorDot = container.querySelector<HTMLElement>('#cursorDot')
+
+    if (cursor && cursorDot) {
+      let cursorX = 0
+      let cursorY = 0
+      let delayedX = 0
+      let delayedY = 0
+      let cursorAnimationId = 0
+
+      const handleCursorMove = (event: MouseEvent) => {
+        cursorX = event.clientX
+        cursorY = event.clientY
+      }
+
+      const animateCursor = () => {
+        delayedX += (cursorX - delayedX) * 0.35
+        delayedY += (cursorY - delayedY) * 0.35
+        cursor.style.left = `${cursorX}px`
+        cursor.style.top = `${cursorY}px`
+        cursorDot.style.left = `${delayedX}px`
+        cursorDot.style.top = `${delayedY}px`
+        cursorAnimationId = window.requestAnimationFrame(animateCursor)
+      }
+
+      document.addEventListener('mousemove', handleCursorMove)
+      animateCursor()
+
+      const interactiveCleanups = Array.from(
+        container.querySelectorAll<HTMLElement>('a,button,.clickable,.card-interactive,input,textarea,.btn'),
+      ).map((element) => {
+        const handleEnter = () => {
+          cursor.classList.add('hovering')
+          cursorDot.classList.add('hovering')
+        }
+
+        const handleLeave = () => {
+          cursor.classList.remove('hovering')
+          cursorDot.classList.remove('hovering')
+        }
+
+        element.addEventListener('mouseenter', handleEnter)
+        element.addEventListener('mouseleave', handleLeave)
+
+        return () => {
+          element.removeEventListener('mouseenter', handleEnter)
+          element.removeEventListener('mouseleave', handleLeave)
+        }
+      })
+
+      cleanupTasks.push(...interactiveCleanups)
+      cleanupTasks.push(() => {
+        window.cancelAnimationFrame(cursorAnimationId)
+        document.removeEventListener('mousemove', handleCursorMove)
+      })
+    }
+
+    return () => {
+      if (closeModalTimeoutId !== null) {
+        window.clearTimeout(closeModalTimeoutId)
+      }
+
+      cleanupTasks.forEach((cleanup) => cleanup())
+      document.body.style.overflow = ''
+      container.innerHTML = ''
+      managedHeadNodes.forEach((node) => node.remove())
+    }
+  }, [])
+
   return (
-    <section className="landing-page-shell" aria-label="报名首页">
-      <iframe
-        className="landing-page-frame"
-        srcDoc={homeLandingPageHtml}
-        title="ABSTRACT JAM 2026 报名页"
-      />
-    </section>
+    <section className="landing-page-shell" aria-label="报名首页" ref={containerRef} />
   )
 }
 
@@ -1339,6 +1709,19 @@ function App() {
 
     applyWechatShareData(window.wx, shareData)
   }, [currentPage.page, currentShareWork, isWechatClient, wechatReady])
+
+  useEffect(() => {
+    const root = document.getElementById('root')
+    const isHomePage = currentPage.page === 'home'
+
+    root?.classList.toggle('app-root--home', isHomePage)
+    document.body.classList.toggle('app-body--home', isHomePage)
+
+    return () => {
+      root?.classList.remove('app-root--home')
+      document.body.classList.remove('app-body--home')
+    }
+  }, [currentPage.page])
 
   return (
     <main className={currentPage.page === 'home' ? 'page-shell page-shell--home' : 'page-shell'}>
