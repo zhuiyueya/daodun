@@ -1983,7 +1983,7 @@ function App() {
             <h2 id="share-dialog-title">分享海报</h2>
             <p className="share-copy">
               {isWechatClient
-                ? '生成后可长按海报保存到相册，再发给好友或分享到朋友圈。'
+                ? '长按下方海报图片，保存到相册后再发送给朋友或分享到朋友圈。'
                 : '生成后可直接保存图片，再转发到社交平台或聊天窗口。'}
             </p>
             <div className="share-poster-preview">
@@ -2000,14 +2000,16 @@ function App() {
               <button className="ghost-button" type="button" onClick={closeSharePoster}>
                 关闭
               </button>
-              <button
-                className="primary-button"
-                type="button"
-                onClick={downloadSharePoster}
-                disabled={!sharePosterDownloadUrl || sharePosterLoading}
-              >
-                保存图片
-              </button>
+              {isWechatClient ? null : (
+                <button
+                  className="primary-button"
+                  type="button"
+                  onClick={downloadSharePoster}
+                  disabled={!sharePosterDownloadUrl || sharePosterLoading}
+                >
+                  保存图片
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -181,6 +181,36 @@ describe('App', () => {
     expect(screen.getByAltText('真实作品 分享海报')).toHaveAttribute('src', 'data:image/png;base64,poster')
   })
 
+  it('shows long-press guidance instead of download in wechat environment', async () => {
+    const originalNavigator = window.navigator
+    Object.defineProperty(window, 'navigator', {
+      configurable: true,
+      value: {
+        ...originalNavigator,
+        userAgent: 'Mozilla/5.0 MicroMessenger',
+        clipboard: { writeText: vi.fn() },
+      },
+    })
+
+    window.location.hash = '#/work/live-work-1'
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '分享作品' })).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: '分享作品' }))
+
+    expect(await screen.findByText('长按下方海报图片，保存到相册后再发送给朋友或分享到朋友圈。')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '保存图片' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '关闭' })).toBeInTheDocument()
+
+    Object.defineProperty(window, 'navigator', {
+      configurable: true,
+      value: originalNavigator,
+    })
+  })
+
   it('supports email verification login flow', async () => {
     window.location.hash = '#/auth?next=%2Fsubmit'
     render(<App />)
