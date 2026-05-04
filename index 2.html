@@ -792,19 +792,101 @@
             margin-bottom: 6px;
         }
 
+        .prize-entry {
+            margin-bottom: 24px;
+            padding: 26px 28px;
+            background: linear-gradient(180deg, rgba(6, 214, 240, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(6, 214, 240, 0.18);
+            border-radius: var(--radius-lg);
+        }
+
+        .prize-entry__eyebrow {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(6, 214, 240, 0.12);
+            color: var(--accent-cyan);
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .prize-entry__title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 14px;
+        }
+
+        .prize-entry__list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px 18px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .prize-entry__list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.94rem;
+            line-height: 1.7;
+        }
+
+        .prize-entry__list li::before {
+            content: '✦';
+            color: var(--accent-cyan);
+            flex: 0 0 auto;
+        }
+
+        .prize-group {
+            margin-top: 30px;
+        }
+
+        .prize-group__title {
+            font-family: var(--font-display);
+            font-size: 1.08rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 18px;
+        }
+
+        .prize-featured-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .prize-featured-row .prize-card {
+            width: calc((100% - 40px) / 3);
+        }
+
         .prizes-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 20px;
         }
 
         @media (max-width: 900px) {
-            .prizes-grid {
+            .prize-entry {
+                padding: 22px 20px;
+            }
+
+            .prize-entry__list {
                 grid-template-columns: 1fr;
             }
 
-            .prize-card--featured {
-                order: -1;
+            .prize-featured-row .prize-card {
+                width: 100%;
+            }
+
+            .prizes-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1163,7 +1245,7 @@
                     </p>
                 </div>
                 <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="ctaButton-zsPMZb clickable" target="_blank" rel="noopener noreferrer">立即报名</a>
-                <div class="eventTime-byby0q">2026.4.30-2026.5.25</div>
+                <div class="eventTime-byby0q">2026.4.30-2026.5.23</div>
             </div>
             <div class="heroImage-rpOmws" aria-hidden="true">
                 <img src="https://lf-cdn.trae.com.cn/obj/trae-com-cn/trae_website_prod_cn/static/image/banner.e89dee89.png"
@@ -1187,38 +1269,52 @@
                 <h2 class="section-header__title">不止是比赛，更是商业起点</h2>
                 <p class="section-header__desc">资金奖励 + 投资机会 + 商业孵化，三位一体。</p>
             </div>
-            <div class="prizes-grid">
-                <div class="prize-card reveal">
-                    <div class="prize-card__label">脑洞大开奖 ×1</div>
-                    <ul class="prize-card__list">
-                        <li>现金奖励 ¥300</li>
-                        <li>投资人1v1交流</li>
-                        <li>官方获奖证书</li>
-                    </ul>
+            <div class="prize-entry reveal">
+                <div class="prize-entry__eyebrow">入围即享</div>
+                <div class="prize-entry__title">所有进入 Demo Day 的团队均可获得</div>
+                <ul class="prize-entry__list">
+                    <li>线下路演展示机会</li>
+                    <li>投资人面对面交流</li>
+                    <li>创业导师反馈</li>
+                </ul>
+            </div>
+
+            <div class="prize-group">
+                <div class="prize-group__title reveal">路演奖项</div>
+                <div class="prizes-grid">
+                    <div class="prize-card reveal">
+                        <div class="prize-card__label">脑洞大开奖 ×1</div>
+                        <ul class="prize-card__list">
+                            <li>现金奖励 ¥300</li>
+                            <li>投资人1v1深度交流</li>
+                        </ul>
+                    </div>
+                    <div class="prize-card prize-card--featured reveal">
+                        <div class="prize-card__label">抽象之王 ×1</div>
+                        <ul class="prize-card__list">
+                            <li>现金奖励 ¥500</li>
+                            <li>投资对接</li>
+                            <li>赛后持续资源支持</li>
+                        </ul>
+                    </div>
+                    <div class="prize-card reveal">
+                        <div class="prize-card__label">最佳Vibe奖 ×2</div>
+                        <ul class="prize-card__list">
+                            <li>现金奖励 ¥100</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="prize-card prize-card--featured reveal">
-                    <div class="prize-card__label">抽象之王 ×1</div>
-                    <ul class="prize-card__list">
-                        <li>现金奖励 ¥500</li>
-                        <li>顶级VC直推路演</li>
-                        <li>3个月商业孵化</li>
-                        <li>技术资源全面支持</li>
-                        <li>媒体曝光推广</li>
-                    </ul>
-                </div>
-                <div class="prize-card reveal">
-                    <div class="prize-card__label">最佳Vibe奖 ×2</div>
-                    <ul class="prize-card__list">
-                        <li>现金奖励 ¥100</li>
-                        <li>投资人交流机会</li>
-                        <li>官方获奖证书</li>
-                    </ul>
-                </div>
-                <div class="prize-card reveal">
-                    <div class="prize-card__label">人气最佳奖 ×3</div>
-                    <ul class="prize-card__list">
-                        <li>现金奖励 ¥100</li>
-                    </ul>
+            </div>
+
+            <div class="prize-group">
+                <div class="prize-group__title reveal">线上人气奖</div>
+                <div class="prize-featured-row">
+                    <div class="prize-card reveal">
+                        <div class="prize-card__label">人气最佳 ×3</div>
+                        <ul class="prize-card__list">
+                            <li>现金奖励 ¥100</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1301,10 +1397,6 @@
                             class="faq-item__arrow">▼</span></button>
                     <div class="faq-item__answer">当然可以！这正是Vibe
                         Coding的意义所在。只要你有一个清晰的想法，用AI工具就能生成产品原型。我们看重的是<strong>创意的价值</strong>，而不是代码行数。</div>
-                </div>
-                <div class="faq-item"><button class="faq-item__question clickable">团队参赛还是个人参赛？<span
-                            class="faq-item__arrow">▼</span></button>
-                    <div class="faq-item__answer">都可以！个人或团队（不超过5人）均可。开幕时提供<strong>组队匹配</strong>环节。</div>
                 </div>
                 <div class="faq-item"><button class="faq-item__question clickable">项目必须是AI相关吗？<span
                             class="faq-item__arrow">▼</span></button>
