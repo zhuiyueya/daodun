@@ -1456,6 +1456,7 @@ function App() {
   const [sharePosterOpen, setSharePosterOpen] = useState(false)
   const [sharePosterLoading, setSharePosterLoading] = useState(false)
   const [sharePosterUrl, setSharePosterUrl] = useState<string | null>(null)
+  const [sharePosterDownloadUrl, setSharePosterDownloadUrl] = useState<string | null>(null)
   const [sharePosterError, setSharePosterError] = useState('')
   const [sharePosterWarning, setSharePosterWarning] = useState('')
   const [loading, setLoading] = useState({
@@ -1689,7 +1690,8 @@ function App() {
     setSharePosterWarning('')
 
     try {
-      setSharePosterUrl((currentUrl) => {
+      setSharePosterUrl(() => null)
+      setSharePosterDownloadUrl((currentUrl) => {
         if (currentUrl) {
           URL.revokeObjectURL(currentUrl)
         }
@@ -1713,7 +1715,8 @@ function App() {
         setSharePosterWarning(`封面图未能载入，已使用标题占位：${posterResult.coverLoadError}`)
       }
 
-      setSharePosterUrl(URL.createObjectURL(posterResult.blob))
+      setSharePosterUrl(posterResult.dataUrl)
+      setSharePosterDownloadUrl(URL.createObjectURL(posterResult.blob))
     } catch (error) {
       setSharePosterError(error instanceof Error ? error.message : '海报生成失败，请稍后再试')
     } finally {
@@ -1726,12 +1729,12 @@ function App() {
   }
 
   function downloadSharePoster() {
-    if (!sharePosterUrl || !currentShareWork) {
+    if (!sharePosterDownloadUrl || !currentShareWork) {
       return
     }
 
     const anchor = document.createElement('a')
-    anchor.href = sharePosterUrl
+    anchor.href = sharePosterDownloadUrl
     anchor.download = `${currentShareWork.title}-分享海报.png`
     anchor.click()
 
@@ -1786,10 +1789,14 @@ function App() {
   useEffect(() => {
     return () => {
       if (sharePosterUrl) {
-        URL.revokeObjectURL(sharePosterUrl)
+        // data URL does not need cleanup
+      }
+
+      if (sharePosterDownloadUrl) {
+        URL.revokeObjectURL(sharePosterDownloadUrl)
       }
     }
-  }, [sharePosterUrl])
+  }, [sharePosterUrl, sharePosterDownloadUrl])
 
   return (
     <main className={currentPage.page === 'home' ? 'page-shell page-shell--home' : 'page-shell'}>
@@ -1997,7 +2004,7 @@ function App() {
                 className="primary-button"
                 type="button"
                 onClick={downloadSharePoster}
-                disabled={!sharePosterUrl || sharePosterLoading}
+                disabled={!sharePosterDownloadUrl || sharePosterLoading}
               >
                 保存图片
               </button>

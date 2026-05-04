@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 vi.mock('./lib/sharePoster', () => ({
   createWorkSharePoster: vi.fn(async () => ({
     blob: new Blob(['poster'], { type: 'image/png' }),
+    dataUrl: 'data:image/png;base64,poster',
     coverLoadError: null,
   })),
 }))
@@ -177,6 +178,7 @@ describe('App', () => {
 
     expect(await screen.findByRole('heading', { name: '分享海报', level: 2 })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '保存图片' })).toBeInTheDocument()
+    expect(screen.getByAltText('真实作品 分享海报')).toHaveAttribute('src', 'data:image/png;base64,poster')
   })
 
   it('supports email verification login flow', async () => {

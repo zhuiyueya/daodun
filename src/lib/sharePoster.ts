@@ -9,6 +9,7 @@ interface WorkSharePosterInput {
 
 interface WorkSharePosterResult {
   blob: Blob
+  dataUrl: string
   coverLoadError: string | null
 }
 
@@ -300,6 +301,7 @@ export async function createWorkSharePoster({
 
   return {
     blob: await canvasToBlob(canvas),
+    dataUrl: canvas.toDataURL('image/png'),
     coverLoadError,
   } satisfies WorkSharePosterResult
 }
