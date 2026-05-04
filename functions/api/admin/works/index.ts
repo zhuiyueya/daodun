@@ -11,6 +11,7 @@ export const onRequestGet: PagesFunction = async (context) =>
           works.title,
           works.description,
           works.author_name,
+          works.wechat_id,
           works.external_url,
           works.platform_type,
           works.cover_image_url,
@@ -29,6 +30,7 @@ export const onRequestGet: PagesFunction = async (context) =>
       title: string
       description: string
       author_name: string
+      wechat_id: string | null
       external_url: string | null
       platform_type: string
       cover_image_url: string | null
@@ -45,6 +47,7 @@ export const onRequestGet: PagesFunction = async (context) =>
         title: row.title,
         description: row.description,
         authorName: row.author_name,
+        wechatId: row.wechat_id ?? undefined,
         externalUrl: row.external_url,
         platformType: row.platform_type,
         coverImageUrl: row.cover_image_url,

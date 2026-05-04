@@ -32,6 +32,7 @@ import type { PlatformType, PublicWork, SessionUser, Track } from './types'
 const TITLE_MAX = 30
 const DESCRIPTION_MAX = 1200
 const AUTHOR_MAX = 15
+const WECHAT_ID_MAX = 50
 
 const galleryFilters = [
   { key: 'all', label: '全部' },
@@ -668,6 +669,7 @@ function SubmitPage({
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [authorName, setAuthorName] = useState('')
+  const [wechatId, setWechatId] = useState('')
   const [externalUrl, setExternalUrl] = useState('')
   const [platformType, setPlatformType] = useState<PlatformType>('website')
   const [coverFile, setCoverFile] = useState<File | null>(null)
@@ -678,9 +680,11 @@ function SubmitPage({
   const titleLength = title.trim().length
   const descriptionLength = description.trim().length
   const authorLength = authorName.trim().length
+  const wechatIdLength = wechatId.trim().length
   const titleTooLong = titleLength > TITLE_MAX
   const descriptionTooLong = descriptionLength > DESCRIPTION_MAX
   const authorTooLong = authorLength > AUTHOR_MAX
+  const wechatIdTooLong = wechatIdLength > WECHAT_ID_MAX
 
   async function handleSubmit() {
     if (!me) {
@@ -718,6 +722,16 @@ function SubmitPage({
       return
     }
 
+    if (wechatIdLength === 0) {
+      onNotice('请填写微信号')
+      return
+    }
+
+    if (wechatIdTooLong) {
+      onNotice(`微信号不能超过 ${WECHAT_ID_MAX} 个字`)
+      return
+    }
+
     if (track === 'landing' && !externalUrl.trim()) {
       onNotice('落地作品请填写作品链接')
       return
@@ -751,6 +765,7 @@ function SubmitPage({
         title: title.trim(),
         description: description.trim(),
         authorName: authorName.trim(),
+        wechatId: wechatId.trim(),
         externalUrl: externalUrl.trim() || null,
         platformType: track === 'landing' ? platformType : 'none',
         coverImage,
@@ -759,6 +774,7 @@ function SubmitPage({
       setTitle('')
       setDescription('')
       setAuthorName('')
+      setWechatId('')
       setExternalUrl('')
       setCoverFile(null)
       setExtraFiles([])
@@ -870,6 +886,19 @@ function SubmitPage({
           </small>
         </label>
 
+        <label className="field">
+          <span>微信号</span>
+          <input
+            value={wechatId}
+            onChange={(event) => setWechatId(event.target.value)}
+            maxLength={WECHAT_ID_MAX}
+            placeholder="仅管理员可见，用于后续联系"
+          />
+          <small className={wechatIdTooLong ? 'field-counter over' : 'field-counter'}>
+            {wechatIdLength}/{WECHAT_ID_MAX}
+          </small>
+        </label>
+
         {track === 'landing' ? (
           <>
             <label className="field">
@@ -962,6 +991,7 @@ function EditWorkPage({
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [authorName, setAuthorName] = useState('')
+  const [wechatId, setWechatId] = useState('')
   const [externalUrl, setExternalUrl] = useState('')
   const [platformType, setPlatformType] = useState<PlatformType>('website')
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
@@ -974,6 +1004,7 @@ function EditWorkPage({
   const titleLength = title.trim().length
   const descriptionLength = description.trim().length
   const authorLength = authorName.trim().length
+  const wechatIdLength = wechatId.trim().length
   const totalImages = (coverImageUrl || coverFile ? 1 : 0) + images.length
 
   useEffect(
@@ -997,6 +1028,7 @@ function EditWorkPage({
         setTitle(work.title)
         setDescription(work.description)
         setAuthorName(work.authorName)
+        setWechatId(work.wechatId ?? '')
         setExternalUrl(work.externalUrl ?? '')
         setPlatformType(work.platformType)
         setCoverImageUrl(work.coverImageUrl ?? null)
@@ -1054,6 +1086,16 @@ function EditWorkPage({
       return
     }
 
+    if (!wechatId.trim()) {
+      onNotice('请填写微信号')
+      return
+    }
+
+    if (wechatIdLength > WECHAT_ID_MAX) {
+      onNotice(`微信号不能超过 ${WECHAT_ID_MAX} 个字`)
+      return
+    }
+
     if (track === 'landing' && !externalUrl.trim()) {
       onNotice('落地作品请填写作品链接')
       return
@@ -1087,6 +1129,7 @@ function EditWorkPage({
         title: title.trim(),
         description: description.trim(),
         authorName: authorName.trim(),
+        wechatId: wechatId.trim(),
         externalUrl: track === 'landing' ? (externalUrl.trim() || null) : null,
         platformType: track === 'landing' ? platformType : 'none',
         coverImage: uploadedCover ?? (coverImageUrl ? { url: coverImageUrl } : null),
@@ -1180,6 +1223,12 @@ function EditWorkPage({
           <span>群昵称</span>
           <input value={authorName} onChange={(event) => setAuthorName(event.target.value)} maxLength={AUTHOR_MAX} />
           <small className="field-counter">{authorLength}/{AUTHOR_MAX}</small>
+        </label>
+
+        <label className="field">
+          <span>微信号</span>
+          <input value={wechatId} onChange={(event) => setWechatId(event.target.value)} maxLength={WECHAT_ID_MAX} />
+          <small className="field-counter">{wechatIdLength}/{WECHAT_ID_MAX}</small>
         </label>
 
         {track === 'landing' ? (
@@ -1886,6 +1935,17 @@ function App() {
                   <span className="detail-label">群昵称</span>
                   <p>{currentDetail.authorName}</p>
                 </div>
+                {me?.isAdmin && currentDetail.wechatId ? (
+                  <div>
+                    <span className="detail-label">微信号</span>
+                    <div className="detail-link-row">
+                      <p>{currentDetail.wechatId}</p>
+                      <button className="copy-button" type="button" onClick={() => void copyText(currentDetail.wechatId ?? '')}>
+                        复制
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
                 {currentDetail.externalUrl ? (
                   <div>
                     <span className="detail-label">可访问网址</span>

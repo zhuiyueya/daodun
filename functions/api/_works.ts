@@ -6,6 +6,7 @@ interface WorkRow {
   title: string
   description: string
   author_name: string
+  wechat_id: string | null
   external_url: string | null
   platform_type: string
   cover_image_url: string | null
@@ -32,6 +33,7 @@ export async function getWorkById(context: AppContext, workId: string) {
         title,
         description,
         author_name,
+        wechat_id,
         external_url,
         platform_type,
         cover_image_url,
@@ -70,6 +72,7 @@ export async function getWorkById(context: AppContext, workId: string) {
     title: work.title,
     description: work.description,
     authorName: work.author_name,
+    wechatId: work.wechat_id,
     externalUrl: work.external_url,
     platformType: work.platform_type,
     coverImageUrl: work.cover_image_url,

@@ -14,6 +14,7 @@ export interface PublicWork {
   title: string
   description: string
   authorName: string
+  wechatId?: string
   externalUrl: string | null
   platformType: PlatformType
   coverImageUrl: string | null

@@ -16,6 +16,7 @@ interface UpdateWorkBody {
   title?: string
   description?: string
   authorName?: string
+  wechatId?: string
   externalUrl?: string | null
   platformType?: string
   coverImage?: {
@@ -54,6 +55,7 @@ export const onRequestGet: PagesFunction = async (context) =>
         title: work.title,
         description: work.description,
         authorName: work.authorName,
+        wechatId: user && (user.id === work.userId || user.isAdmin) ? work.wechatId ?? undefined : undefined,
         externalUrl: work.externalUrl,
         platformType: work.platformType,
         coverImageUrl: work.coverImageUrl,
@@ -83,6 +85,7 @@ export const onRequestPut: PagesFunction = async (context) =>
     const title = (body.title ?? work.title).trim()
     const description = (body.description ?? work.description).trim()
     const authorName = (body.authorName ?? work.authorName).trim()
+    const wechatId = (body.wechatId ?? work.wechatId ?? '').trim()
     const externalUrl = (body.externalUrl ?? work.externalUrl ?? '').trim()
     const platformType = body.platformType ?? work.platformType
 
@@ -96,6 +99,10 @@ export const onRequestPut: PagesFunction = async (context) =>
 
     if (!authorName || authorName.length > 15) {
       throw new HttpError(400, '群昵称不能为空且不能超过 15 个字')
+    }
+
+    if (!wechatId || wechatId.length > 50) {
+      throw new HttpError(400, '微信号不能为空且不能超过 50 个字')
     }
 
     if (!allowedPlatformTypes.includes(platformType)) {
@@ -128,7 +135,7 @@ export const onRequestPut: PagesFunction = async (context) =>
     await context.env.DB.prepare(
       `
         UPDATE works
-        SET title = ?, description = ?, author_name = ?, external_url = ?, platform_type = ?, cover_image_url = ?, cover_object_key = ?, status = 'pending', reject_reason = NULL, updated_at = ?
+        SET title = ?, description = ?, author_name = ?, wechat_id = ?, external_url = ?, platform_type = ?, cover_image_url = ?, cover_object_key = ?, status = 'pending', reject_reason = NULL, updated_at = ?
         WHERE id = ?
       `,
     )
@@ -136,6 +143,7 @@ export const onRequestPut: PagesFunction = async (context) =>
         title,
         description,
         authorName,
+        wechatId,
         externalUrl || null,
         platformType,
         finalCover?.url ?? null,

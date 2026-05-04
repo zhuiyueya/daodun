@@ -172,6 +172,7 @@ export async function createWork(payload: {
   title: string
   description: string
   authorName: string
+  wechatId: string
   externalUrl: string | null
   platformType: PlatformType
   coverImage: StoredAsset | null
@@ -189,6 +190,7 @@ export async function updateWork(
     title: string
     description: string
     authorName: string
+    wechatId: string
     externalUrl: string | null
     platformType: PlatformType
     coverImage?: {

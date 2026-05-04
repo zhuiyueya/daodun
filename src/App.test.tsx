@@ -40,6 +40,7 @@ function createFetchMock(options?: {
             title: '真实作品',
             description: '这是从 API 里来的真实作品说明',
             authorName: '匿名',
+            wechatId: 'wx-live-001',
             externalUrl: 'https://example.com',
             platformType: 'website',
             coverImageUrl: 'https://example.com/cover.jpg',
@@ -57,6 +58,7 @@ function createFetchMock(options?: {
           title: '真实作品',
           description: '这是从 API 里来的真实作品说明',
           authorName: '匿名',
+          wechatId: 'wx-live-001',
           externalUrl: 'https://example.com',
           platformType: 'website',
           coverImageUrl: 'https://example.com/cover.jpg',
@@ -77,6 +79,7 @@ function createFetchMock(options?: {
             title: '我的作品',
             description: '等待审核中',
             authorName: '我',
+            wechatId: 'wx-mine-001',
             externalUrl: null,
             platformType: 'none',
             coverImageUrl: null,
@@ -172,6 +175,30 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: '分享作品' })).toBeInTheDocument()
     expect(screen.getByAltText('真实作品 截图 1')).toBeInTheDocument()
     expect(screen.getByText('觉得作品不错？')).toBeInTheDocument()
+    expect(screen.queryByText('微信号')).not.toBeInTheDocument()
+  })
+
+  it('shows wechat id on detail page for admins only', async () => {
+    vi.stubGlobal(
+      'fetch',
+      createFetchMock({
+        me: {
+          id: 'admin-1',
+          email: 'admin@example.com',
+          isAdmin: true,
+        },
+      }),
+    )
+
+    window.location.hash = '#/work/live-work-1'
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: '真实作品', level: 1 })).toBeInTheDocument()
+    })
+
+    expect(screen.getByText('微信号')).toBeInTheDocument()
+    expect(screen.getByText('wx-live-001')).toBeInTheDocument()
   })
 
   it('opens a share poster preview from the detail page', async () => {

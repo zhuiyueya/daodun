@@ -15,6 +15,7 @@ interface SubmitWorkBody {
   title?: string
   description?: string
   authorName?: string
+  wechatId?: string
   externalUrl?: string | null
   platformType?: string
   coverImage?: {
@@ -93,6 +94,7 @@ export const onRequestPost: PagesFunction = async (context) =>
     const title = (body.title ?? '').trim()
     const description = (body.description ?? '').trim()
     const authorName = (body.authorName ?? '').trim()
+    const wechatId = (body.wechatId ?? '').trim()
     const externalUrl = (body.externalUrl ?? '').trim()
     const platformType = body.platformType ?? 'none'
 
@@ -110,6 +112,10 @@ export const onRequestPost: PagesFunction = async (context) =>
 
     if (!authorName || authorName.length > 15) {
       throw new HttpError(400, '群昵称不能为空且不能超过 15 个字')
+    }
+
+    if (!wechatId || wechatId.length > 50) {
+      throw new HttpError(400, '微信号不能为空且不能超过 50 个字')
     }
 
     if (!allowedPlatformTypes.includes(platformType)) {
@@ -149,6 +155,7 @@ export const onRequestPost: PagesFunction = async (context) =>
           title,
           description,
           author_name,
+          wechat_id,
           external_url,
           platform_type,
           cover_image_url,
@@ -158,7 +165,7 @@ export const onRequestPost: PagesFunction = async (context) =>
           created_at,
           updated_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NULL, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NULL, ?, ?)
       `,
     )
       .bind(
@@ -168,6 +175,7 @@ export const onRequestPost: PagesFunction = async (context) =>
         title,
         description,
         authorName,
+        wechatId,
         externalUrl || null,
         platformType,
         finalCover?.url ?? null,
