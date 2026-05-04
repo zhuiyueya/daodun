@@ -20,6 +20,98 @@ function jsonResponse(data: unknown, init?: ResponseInit) {
   })
 }
 
+function createFetchMock(options?: {
+  me?: { id: string; email: string; isAdmin: boolean } | null
+  myWorks?: Array<Record<string, unknown>>
+}) {
+  return vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input.toString()
+
+    if (url === '/api/me') {
+      return jsonResponse({ user: options?.me ?? null })
+    }
+
+    if (url === '/api/works?track=all') {
+      return jsonResponse({
+        works: [
+          {
+            id: 'live-work-1',
+            track: 'landing',
+            title: '真实作品',
+            description: '这是从 API 里来的真实作品说明',
+            authorName: '匿名',
+            externalUrl: 'https://example.com',
+            platformType: 'website',
+            coverImageUrl: 'https://example.com/cover.jpg',
+            createdAt: '2026-04-22T00:00:00+08:00',
+          },
+        ],
+      })
+    }
+
+    if (url === '/api/works/live-work-1') {
+      return jsonResponse({
+        work: {
+          id: 'live-work-1',
+          track: 'landing',
+          title: '真实作品',
+          description: '这是从 API 里来的真实作品说明',
+          authorName: '匿名',
+          externalUrl: 'https://example.com',
+          platformType: 'website',
+          coverImageUrl: 'https://example.com/cover.jpg',
+          imageUrls: ['https://example.com/1.jpg'],
+          status: 'approved',
+          rejectReason: null,
+          createdAt: '2026-04-22T00:00:00+08:00',
+        },
+      })
+    }
+
+    if (url === '/api/my/works') {
+      return jsonResponse({
+        works: options?.myWorks ?? [
+          {
+            id: 'mine-1',
+            track: 'idea',
+            title: '我的作品',
+            description: '等待审核中',
+            authorName: '我',
+            externalUrl: null,
+            platformType: 'none',
+            coverImageUrl: null,
+            imageUrls: [],
+            status: 'pending',
+            rejectReason: null,
+            createdAt: '2026-04-22T00:00:00+08:00',
+          },
+        ],
+      })
+    }
+
+    if (url === '/api/auth/request-code' && init?.method === 'POST') {
+      return jsonResponse({ ok: true, message: '验证码已发送' })
+    }
+
+    if (url === '/api/auth/verify-code' && init?.method === 'POST') {
+      return jsonResponse({
+        ok: true,
+        user: {
+          id: 'user-1',
+          email: 'test@example.com',
+          isAdmin: false,
+        },
+      })
+    }
+
+    if (url === '/api/auth/logout' && init?.method === 'POST') {
+      return jsonResponse({ ok: true })
+    }
+
+    return jsonResponse({}, { status: 404 })
+  })
+}
+
 describe('App', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
@@ -30,92 +122,7 @@ describe('App', () => {
         revokeObjectURL: vi.fn(),
       }),
     )
-    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      const url = typeof input === 'string' ? input : input.toString()
-
-      if (url === '/api/me') {
-        return jsonResponse({ user: null })
-      }
-
-      if (url === '/api/works?track=all') {
-        return jsonResponse({
-          works: [
-            {
-              id: 'live-work-1',
-              track: 'landing',
-              title: '真实作品',
-              description: '这是从 API 里来的真实作品说明',
-              authorName: '匿名',
-              externalUrl: 'https://example.com',
-              platformType: 'website',
-              coverImageUrl: 'https://example.com/cover.jpg',
-              createdAt: '2026-04-22T00:00:00+08:00',
-            },
-          ],
-        })
-      }
-
-      if (url === '/api/works/live-work-1') {
-        return jsonResponse({
-          work: {
-            id: 'live-work-1',
-            track: 'landing',
-            title: '真实作品',
-            description: '这是从 API 里来的真实作品说明',
-            authorName: '匿名',
-            externalUrl: 'https://example.com',
-            platformType: 'website',
-            coverImageUrl: 'https://example.com/cover.jpg',
-            imageUrls: ['https://example.com/1.jpg'],
-            status: 'approved',
-            rejectReason: null,
-            createdAt: '2026-04-22T00:00:00+08:00',
-          },
-        })
-      }
-
-      if (url === '/api/my/works') {
-        return jsonResponse({
-          works: [
-            {
-              id: 'mine-1',
-              track: 'idea',
-              title: '我的作品',
-              description: '等待审核中',
-              authorName: '我',
-              externalUrl: null,
-              platformType: 'none',
-              coverImageUrl: null,
-              imageUrls: [],
-              status: 'pending',
-              rejectReason: null,
-              createdAt: '2026-04-22T00:00:00+08:00',
-            },
-          ],
-        })
-      }
-
-      if (url === '/api/auth/request-code' && init?.method === 'POST') {
-        return jsonResponse({ ok: true, message: '验证码已发送' })
-      }
-
-      if (url === '/api/auth/verify-code' && init?.method === 'POST') {
-        return jsonResponse({
-          ok: true,
-          user: {
-            id: 'user-1',
-            email: 'test@example.com',
-            isAdmin: false,
-          },
-        })
-      }
-
-      if (url === '/api/auth/logout' && init?.method === 'POST') {
-        return jsonResponse({ ok: true })
-      }
-
-      return jsonResponse({}, { status: 404 })
-    }))
+    vi.stubGlobal('fetch', createFetchMock())
   })
 
   afterEach(() => {
@@ -164,6 +171,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '分享作品' })).toBeInTheDocument()
     expect(screen.getByAltText('真实作品 截图 1')).toBeInTheDocument()
+    expect(screen.getByText('觉得作品不错？')).toBeInTheDocument()
   })
 
   it('opens a share poster preview from the detail page', async () => {
@@ -201,7 +209,7 @@ describe('App', () => {
 
     fireEvent.click(screen.getByRole('button', { name: '分享作品' }))
 
-    expect(await screen.findByText('长按下方海报图片，保存到相册后再发送给朋友或分享到朋友圈。')).toBeInTheDocument()
+    expect(await screen.findByText('长按保存到相册')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '保存图片' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '关闭' })).toBeInTheDocument()
 
@@ -209,6 +217,40 @@ describe('App', () => {
       configurable: true,
       value: originalNavigator,
     })
+  })
+
+  it('shows owner-specific share copy for my own work', async () => {
+    vi.stubGlobal(
+      'fetch',
+      createFetchMock({
+        me: {
+          id: 'user-1',
+          email: 'test@example.com',
+          isAdmin: false,
+        },
+        myWorks: [
+          {
+            id: 'live-work-1',
+            track: 'landing',
+            title: '真实作品',
+            description: '这是从 API 里来的真实作品说明',
+            authorName: '匿名',
+            externalUrl: 'https://example.com',
+            platformType: 'website',
+            coverImageUrl: 'https://example.com/cover.jpg',
+            imageUrls: [],
+            status: 'approved',
+            rejectReason: null,
+            createdAt: '2026-04-22T00:00:00+08:00',
+          },
+        ],
+      }),
+    )
+
+    window.location.hash = '#/work/live-work-1'
+    render(<App />)
+
+    expect(await screen.findByText('分享给自己的朋友看看？')).toBeInTheDocument()
   })
 
   it('supports email verification login flow', async () => {

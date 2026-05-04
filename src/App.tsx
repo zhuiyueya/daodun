@@ -1549,6 +1549,12 @@ function App() {
   }, [currentPage])
 
   useEffect(() => {
+    if (currentPage.page === 'detail' && me) {
+      void refreshMyWorks()
+    }
+  }, [currentPage.page, me])
+
+  useEffect(() => {
     if (currentPage.page === 'gallery') {
       void refreshGallery(activeFilter)
     }
@@ -1753,6 +1759,7 @@ function App() {
   const currentDetail = detailWork
   const currentShareWork =
     currentPage.page === 'detail' && currentDetail?.id === currentPage.workId ? currentDetail : null
+  const isOwnDetailWork = !!currentShareWork && !!me && myWorks.some((work) => work.id === currentShareWork.id)
 
   useEffect(() => {
     if (!isWechatClient || !wechatReady || !window.wx) {
@@ -1869,7 +1876,7 @@ function App() {
               ) : null}
               <h1 id="detail-title">{currentDetail.title}</h1>
               <div className="detail-share-bar">
-                <p className="meta-text">把作品做成分享海报，保存后可发给好友或朋友圈。</p>
+                <p className="meta-text">{isOwnDetailWork ? '分享给自己的朋友看看？' : '觉得作品不错？'}</p>
                 <button className="ghost-button" type="button" onClick={() => void openSharePoster(currentDetail)}>
                   分享作品
                 </button>
@@ -1982,9 +1989,7 @@ function App() {
             <p className="eyebrow">作品分享</p>
             <h2 id="share-dialog-title">分享海报</h2>
             <p className="share-copy">
-              {isWechatClient
-                ? '长按下方海报图片，保存到相册后再发送给朋友或分享到朋友圈。'
-                : '生成后可直接保存图片，再转发到社交平台或聊天窗口。'}
+              {isWechatClient ? '长按保存到相册' : '保存图片'}
             </p>
             <div className="share-poster-preview">
               {sharePosterLoading ? <p className="meta-text">正在生成海报...</p> : null}
