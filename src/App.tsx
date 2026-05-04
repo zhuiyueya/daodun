@@ -27,6 +27,7 @@ import {
   isWeChatBrowser,
   loadWechatSdk,
 } from './lib/wechat'
+import { createWorkSharePoster } from './lib/sharePoster'
 import type { PlatformType, PublicWork, SessionUser, Track } from './types'
 const TITLE_MAX = 30
 const DESCRIPTION_MAX = 1200
@@ -1447,12 +1448,16 @@ function App() {
   const [activeFilter, setActiveFilter] = useState<GalleryFilter>('all')
   const [notice, setNotice] = useState('')
   const [wechatReady, setWechatReady] = useState(false)
-  const [shareHintOpen, setShareHintOpen] = useState(false)
   const [me, setMe] = useState<SessionUser | null>(null)
   const [liveWorks, setLiveWorks] = useState<PublicWork[]>([])
   const [detailWork, setDetailWork] = useState<PublicWork | null>(null)
   const [myWorks, setMyWorks] = useState<PublicWork[]>([])
   const [adminWorks, setAdminWorks] = useState<PublicWork[]>([])
+  const [sharePosterOpen, setSharePosterOpen] = useState(false)
+  const [sharePosterLoading, setSharePosterLoading] = useState(false)
+  const [sharePosterUrl, setSharePosterUrl] = useState<string | null>(null)
+  const [sharePosterError, setSharePosterError] = useState('')
+  const [sharePosterWarning, setSharePosterWarning] = useState('')
   const [loading, setLoading] = useState({
     me: true,
     gallery: false,
@@ -1677,6 +1682,64 @@ function App() {
     }
   }
 
+  async function openSharePoster(work: PublicWork) {
+    setSharePosterOpen(true)
+    setSharePosterLoading(true)
+    setSharePosterError('')
+    setSharePosterWarning('')
+
+    try {
+      setSharePosterUrl((currentUrl) => {
+        if (currentUrl) {
+          URL.revokeObjectURL(currentUrl)
+        }
+
+        return null
+      })
+
+      const posterResult = await createWorkSharePoster({
+        title: work.title,
+        description: work.description,
+        coverImageUrl: work.coverImageUrl ?? work.imageUrls[0] ?? null,
+        shareUrl: `${window.location.origin}${window.location.pathname}#/work/${work.id}`,
+      })
+
+      if (posterResult.coverLoadError) {
+        console.error('Share poster cover failed', {
+          origin: window.location.origin,
+          coverImageUrl: work.coverImageUrl ?? work.imageUrls[0] ?? null,
+          error: posterResult.coverLoadError,
+        })
+        setSharePosterWarning(`封面图未能载入，已使用标题占位：${posterResult.coverLoadError}`)
+      }
+
+      setSharePosterUrl(URL.createObjectURL(posterResult.blob))
+    } catch (error) {
+      setSharePosterError(error instanceof Error ? error.message : '海报生成失败，请稍后再试')
+    } finally {
+      setSharePosterLoading(false)
+    }
+  }
+
+  function closeSharePoster() {
+    setSharePosterOpen(false)
+  }
+
+  function downloadSharePoster() {
+    if (!sharePosterUrl || !currentShareWork) {
+      return
+    }
+
+    const anchor = document.createElement('a')
+    anchor.href = sharePosterUrl
+    anchor.download = `${currentShareWork.title}-分享海报.png`
+    anchor.click()
+
+    if (isWechatClient) {
+      setNotice('如果微信没有弹出保存，请长按海报图片保存到相册')
+    }
+  }
+
   const filteredWorks = liveWorks.filter((work) => {
     if (activeFilter === 'all') {
       return true
@@ -1687,9 +1750,6 @@ function App() {
   const currentDetail = detailWork
   const currentShareWork =
     currentPage.page === 'detail' && currentDetail?.id === currentPage.workId ? currentDetail : null
-  const canShowShareButton =
-    isWechatClient &&
-    (currentPage.page === 'home' || currentPage.page === 'gallery' || currentPage.page === 'detail')
 
   useEffect(() => {
     if (!isWechatClient || !wechatReady || !window.wx) {
@@ -1722,6 +1782,14 @@ function App() {
       document.body.classList.remove('app-body--home')
     }
   }, [currentPage.page])
+
+  useEffect(() => {
+    return () => {
+      if (sharePosterUrl) {
+        URL.revokeObjectURL(sharePosterUrl)
+      }
+    }
+  }, [sharePosterUrl])
 
   return (
     <main className={currentPage.page === 'home' ? 'page-shell page-shell--home' : 'page-shell'}>
@@ -1793,6 +1861,12 @@ function App() {
                 <img className="detail-cover" src={currentDetail.coverImageUrl} alt={`${currentDetail.title} 展示图`} />
               ) : null}
               <h1 id="detail-title">{currentDetail.title}</h1>
+              <div className="detail-share-bar">
+                <p className="meta-text">把作品做成分享海报，保存后可发给好友或朋友圈。</p>
+                <button className="ghost-button" type="button" onClick={() => void openSharePoster(currentDetail)}>
+                  分享作品
+                </button>
+              </div>
               <div className="detail-info">
                 <div>
                   <span className="detail-label">群昵称</span>
@@ -1889,37 +1963,47 @@ function App() {
         )
       ) : null}
 
-      {canShowShareButton ? (
-        <>
-          <button
-            className="share-fab"
-            type="button"
-            onClick={() => setShareHintOpen(true)}
-            aria-haspopup="dialog"
-            aria-expanded={shareHintOpen}
-          >
-            分享
-          </button>
-
-          {shareHintOpen ? (
-            <div
-              className="share-overlay"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="share-dialog-title"
-              onClick={() => setShareHintOpen(false)}
-            >
-              <div className="share-dialog" onClick={(event) => event.stopPropagation()}>
-                <p className="eyebrow">微信分享</p>
-                <h2 id="share-dialog-title">点击右上角完成分享</h2>
-                <p className="share-copy">发送给朋友，或分享到朋友圈，让更多人看到这个比赛和作品。</p>
-                <button className="ghost-button" type="button" onClick={() => setShareHintOpen(false)}>
-                  我知道了
-                </button>
-              </div>
+      {sharePosterOpen ? (
+        <div
+          className="share-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="share-dialog-title"
+          onClick={closeSharePoster}
+        >
+          <div className="share-dialog share-dialog--poster" onClick={(event) => event.stopPropagation()}>
+            <p className="eyebrow">作品分享</p>
+            <h2 id="share-dialog-title">分享海报</h2>
+            <p className="share-copy">
+              {isWechatClient
+                ? '生成后可长按海报保存到相册，再发给好友或分享到朋友圈。'
+                : '生成后可直接保存图片，再转发到社交平台或聊天窗口。'}
+            </p>
+            <div className="share-poster-preview">
+              {sharePosterLoading ? <p className="meta-text">正在生成海报...</p> : null}
+              {!sharePosterLoading && sharePosterError ? <p className="meta-text">{sharePosterError}</p> : null}
+              {!sharePosterLoading && !sharePosterError && sharePosterWarning ? (
+                <p className="meta-text share-warning">{sharePosterWarning}</p>
+              ) : null}
+              {!sharePosterLoading && !sharePosterError && sharePosterUrl ? (
+                <img className="share-poster-image" src={sharePosterUrl} alt={`${currentShareWork?.title ?? '作品'} 分享海报`} />
+              ) : null}
             </div>
-          ) : null}
-        </>
+            <div className="share-dialog-actions">
+              <button className="ghost-button" type="button" onClick={closeSharePoster}>
+                关闭
+              </button>
+              <button
+                className="primary-button"
+                type="button"
+                onClick={downloadSharePoster}
+                disabled={!sharePosterUrl || sharePosterLoading}
+              >
+                保存图片
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       {currentPage.page === 'home' ? null : (

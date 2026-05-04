@@ -1,5 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
+vi.mock('./lib/sharePoster', () => ({
+  createWorkSharePoster: vi.fn(async () => ({
+    blob: new Blob(['poster'], { type: 'image/png' }),
+    coverLoadError: null,
+  })),
+}))
+
 import App from './App'
 
 function jsonResponse(data: unknown, init?: ResponseInit) {
@@ -15,6 +22,13 @@ function jsonResponse(data: unknown, init?: ResponseInit) {
 describe('App', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    vi.stubGlobal(
+      'URL',
+      Object.assign(URL, {
+        createObjectURL: vi.fn(() => 'blob:poster'),
+        revokeObjectURL: vi.fn(),
+      }),
+    )
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input.toString()
 
@@ -147,7 +161,22 @@ describe('App', () => {
 
     expect(screen.getByText('匿名')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '复制' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '分享作品' })).toBeInTheDocument()
     expect(screen.getByAltText('真实作品 截图 1')).toBeInTheDocument()
+  })
+
+  it('opens a share poster preview from the detail page', async () => {
+    window.location.hash = '#/work/live-work-1'
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '分享作品' })).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: '分享作品' }))
+
+    expect(await screen.findByRole('heading', { name: '分享海报', level: 2 })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '保存图片' })).toBeInTheDocument()
   })
 
   it('supports email verification login flow', async () => {
