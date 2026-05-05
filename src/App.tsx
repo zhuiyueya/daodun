@@ -819,7 +819,7 @@ function SubmitPage({
           <p className="eyebrow">提交作品</p>
           <h1 id="submit-title">登录后直接交作品</h1>
           <p className="form-copy">
-            当前只支持图片上传；视频类作品请填写平台链接并带上 #刀盾杯 标签；如果是未上线 APP等，请先上传到百度网盘等平台，再把分享链接填在作品链接里。
+            当前只支持图片上传；如果是未上线 APP / 视频演示等，请先上传到百度网盘等平台，再把分享链接填在作品链接里。
           </p>
         </div>
 
