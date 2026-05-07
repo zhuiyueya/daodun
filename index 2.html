@@ -888,6 +888,10 @@
             .prizes-grid {
                 grid-template-columns: 1fr;
             }
+
+            .partners-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .prize-card {
@@ -977,6 +981,56 @@
             font-weight: 700;
             font-size: 0.85rem;
             color: var(--accent-purple);
+        }
+
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .partner-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            min-height: 220px;
+            padding: 28px 24px;
+            text-align: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            transition: var(--transition-smooth);
+        }
+
+        .partner-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(6, 214, 240, 0.24);
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.24);
+        }
+
+        .partner-card__logo-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 110px;
+        }
+
+        .partner-card__logo {
+            max-width: min(100%, 220px);
+            max-height: 96px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.18));
+        }
+
+        .partner-card__name {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.5;
         }
 
         .faq-list {
@@ -1381,6 +1435,27 @@
                     <div class="timeline__item-date">2026.06 – 持续</div>
                     <div class="timeline__item-title">商业孵化 & 投资对接</div>
                     <div class="timeline__item-desc">优质项目进入孵化通道</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="partners">
+            <div class="section-header reveal"><span class="section-header__label">校园联动</span>
+                <h2 class="section-header__title">校园合作伙伴</h2>
+                <p class="section-header__desc">感谢这些校园社团与我们一起共创这场比赛。</p>
+            </div>
+            <div class="partners-grid">
+                <div class="partner-card reveal">
+                    <div class="partner-card__logo-wrap">
+                        <img class="partner-card__logo" src="./src/assets/logo-武汉纺织大学千里 IT 协会.png" alt="武汉纺织大学千里 IT 协会 Logo">
+                    </div>
+                    <div class="partner-card__name">武汉纺织大学千里 IT 协会</div>
+                </div>
+                <div class="partner-card reveal">
+                    <div class="partner-card__logo-wrap">
+                        <img class="partner-card__logo" src="./src/assets/logo-湖北经济学院 IT 协会.png" alt="湖北经济学院 IT 协会 Logo">
+                    </div>
+                    <div class="partner-card__name">湖北经济学院 IT 协会</div>
                 </div>
             </div>
         </section>

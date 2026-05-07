@@ -2,6 +2,8 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import './App.css'
 import landingPageHtml from '../index 2.html?raw'
+import partnerLogoHbue from './assets/logo-湖北经济学院 IT 协会.png'
+import partnerLogoWfut from './assets/logo-武汉纺织大学千里 IT 协会.png'
 import {
   ApiError,
   approveWork,
@@ -138,6 +140,10 @@ const homeLandingPageHtml = landingPageHtml
 
         .navbar__cta:hover {`,
   )
+  .replaceAll('./src/assets/logo-武汉纺织大学千里 IT 协会.jpg', partnerLogoWfut)
+  .replaceAll('./src/assets/logo-湖北经济学院 IT 协会.jpg', partnerLogoHbue)
+  .replaceAll('./src/assets/logo-武汉纺织大学千里 IT 协会.png', partnerLogoWfut)
+  .replaceAll('./src/assets/logo-湖北经济学院 IT 协会.png', partnerLogoHbue)
 
 function HomePage() {
   const containerRef = useRef<HTMLDivElement | null>(null)
