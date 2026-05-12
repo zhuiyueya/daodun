@@ -4,6 +4,7 @@ import './App.css'
 import landingPageHtml from '../index 2.html?raw'
 import partnerLogoHbue from './assets/logo-湖北经济学院 IT 协会.png'
 import partnerLogoWfut from './assets/logo-武汉纺织大学千里 IT 协会.png'
+import supportLogoJubian from './assets/聚变开源AI社区.svg'
 import {
   ApiError,
   approveWork,
@@ -144,6 +145,7 @@ const homeLandingPageHtml = landingPageHtml
   .replaceAll('./src/assets/logo-湖北经济学院 IT 协会.jpg', partnerLogoHbue)
   .replaceAll('./src/assets/logo-武汉纺织大学千里 IT 协会.png', partnerLogoWfut)
   .replaceAll('./src/assets/logo-湖北经济学院 IT 协会.png', partnerLogoHbue)
+  .replaceAll('./src/assets/聚变开源AI社区.svg', supportLogoJubian)
 
 function HomePage() {
   const containerRef = useRef<HTMLDivElement | null>(null)
