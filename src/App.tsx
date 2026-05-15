@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import './App.css'
 import landingPageHtml from '../index 2.html?raw'
+import organizerLogo from './assets/主办logo.png'
 import partnerLogoHbue from './assets/logo-湖北经济学院 IT 协会.png'
 import partnerLogoWfut from './assets/logo-武汉纺织大学千里 IT 协会.png'
 import supportLogoJubian from './assets/聚变开源AI社区.svg'
@@ -124,8 +125,8 @@ const landingGalleryUrl = `${window.location.origin}${window.location.pathname}#
 
 const homeLandingPageHtml = landingPageHtml
   .replace(
-    '<a href="#" class="navbar__logo"><span class="navbar__logo-icon">Λ</span>ABSTRACT JAM</a>\n            <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="navbar__cta clickable" target="_blank" rel="noopener noreferrer">立即报名</a>',
-    `<a href="#" class="navbar__logo"><span class="navbar__logo-icon">Λ</span>ABSTRACT JAM</a>
+    '<a href="#" class="navbar__logo"><img class="navbar__logo-image" src="./src/assets/主办logo.png" alt="主办方 Logo"></a>\n            <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="navbar__cta clickable" target="_blank" rel="noopener noreferrer">立即报名</a>',
+    `<a href="#" class="navbar__logo"><img class="navbar__logo-image" src="${organizerLogo}" alt="主办方 Logo"></a>
             <div class="navbar__actions">
                 <a href="${landingGalleryUrl}" class="navbar__cta clickable" target="_parent" rel="noopener noreferrer">作品广场</a>
                 <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="navbar__cta clickable" target="_blank" rel="noopener noreferrer">立即报名</a>
@@ -146,6 +147,8 @@ const homeLandingPageHtml = landingPageHtml
   .replaceAll('./src/assets/logo-武汉纺织大学千里 IT 协会.png', partnerLogoWfut)
   .replaceAll('./src/assets/logo-湖北经济学院 IT 协会.png', partnerLogoHbue)
   .replaceAll('./src/assets/聚变开源AI社区.svg', supportLogoJubian)
+  .replaceAll('./src/assets/主办logo.jpg', organizerLogo)
+  .replaceAll('./src/assets/主办logo.png', organizerLogo)
 
 function HomePage() {
   const containerRef = useRef<HTMLDivElement | null>(null)
