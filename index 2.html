@@ -247,6 +247,15 @@
             display: flex;
             align-items: center;
             flex-shrink: 0;
+            gap: 12px;
+            color: #fff;
+        }
+
+        .navbar__logo-text {
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
         }
 
         .navbar__logo-image {
@@ -292,13 +301,17 @@
             }
 
             .navbar__logo {
-                max-width: 44px;
+                gap: 8px;
             }
 
             .navbar__cta {
                 padding: 0 14px;
                 height: 36px;
                 font-size: 0.8rem;
+            }
+
+            .navbar__logo-text {
+                font-size: 0.84rem;
             }
 
             .navbar__logo-image {
@@ -1319,7 +1332,7 @@
 
     <div class="main-wrapper">
         <nav class="navbar" id="navbar">
-            <a href="#" class="navbar__logo"><img class="navbar__logo-image" src="./src/assets/主办logo.png" alt="主办方 Logo"></a>
+            <a href="#" class="navbar__logo"><img class="navbar__logo-image" src="./src/assets/做点东西社区纯logo.jpg" alt="做点东西社区 Logo"><span class="navbar__logo-text">做点东西社区</span></a>
             <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="navbar__cta clickable" target="_blank" rel="noopener noreferrer">立即报名</a>
         </nav>
 
@@ -1522,6 +1535,12 @@
                     </div>
                     <div class="partner-card__name">武汉大学自强网络文化工作室</div>
                 </div>
+                <div class="partner-card reveal">
+                    <div class="partner-card__logo-wrap">
+                        <img class="partner-card__logo" src="./src/assets/logo-湖北中医药大学 cyber 计算机协会.jpg" alt="湖北中医药大学cyber计算机协会 Logo">
+                    </div>
+                    <div class="partner-card__name">湖北中医药大学cyber计算机协会</div>
+                </div>
             </div>
         </section>
 
@@ -1579,7 +1598,7 @@
                     href="#vibe-coding">参赛工具</a><a href="#submission">参赛方式</a><a href="#timeline">赛事日程</a><a href="#faq">FAQ</a></div>
             <div class="footer__organizer">
                 <span class="footer__organizer-label">主办方</span>
-                <img class="footer__organizer-logo" src="./src/assets/主办logo.png" alt="主办方 Logo">
+                <img class="footer__organizer-logo" src="./src/assets/做点东西社区纯logo.jpg" alt="做点东西社区 Logo">
             </div>
             <p>© 2026 ABSTRACT JAM · Vibe Coding 抽象创作大赛 · 让你的好想法被看见，被投资</p>
         </footer>

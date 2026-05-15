@@ -2,8 +2,9 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import './App.css'
 import landingPageHtml from '../index 2.html?raw'
-import organizerLogo from './assets/主办logo.png'
+import organizerLogo from './assets/做点东西社区纯logo.jpg'
 import partnerLogoHbue from './assets/logo-湖北经济学院 IT 协会.png'
+import partnerLogoHbtcm from './assets/logo-湖北中医药大学 cyber 计算机协会.jpg'
 import partnerLogoWfut from './assets/logo-武汉纺织大学千里 IT 协会.png'
 import partnerLogoWhu from './assets/logo-武汉大学自强网络文化工作室.jpg'
 import supportLogoJubian from './assets/聚变开源AI社区.svg'
@@ -126,8 +127,8 @@ const landingGalleryUrl = `${window.location.origin}${window.location.pathname}#
 
 const homeLandingPageHtml = landingPageHtml
   .replace(
-    '<a href="#" class="navbar__logo"><img class="navbar__logo-image" src="./src/assets/主办logo.png" alt="主办方 Logo"></a>\n            <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="navbar__cta clickable" target="_blank" rel="noopener noreferrer">立即报名</a>',
-    `<a href="#" class="navbar__logo"><img class="navbar__logo-image" src="${organizerLogo}" alt="主办方 Logo"></a>
+    '<a href="#" class="navbar__logo"><img class="navbar__logo-image" src="./src/assets/做点东西社区纯logo.jpg" alt="做点东西社区 Logo"><span class="navbar__logo-text">做点东西社区</span></a>\n            <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="navbar__cta clickable" target="_blank" rel="noopener noreferrer">立即报名</a>',
+    `<a href="#" class="navbar__logo"><img class="navbar__logo-image" src="${organizerLogo}" alt="做点东西社区 Logo"><span class="navbar__logo-text">做点东西社区</span></a>
             <div class="navbar__actions">
                 <a href="${landingGalleryUrl}" class="navbar__cta clickable" target="_parent" rel="noopener noreferrer">作品广场</a>
                 <a href="https://wcnahf1otvjt.feishu.cn/share/base/form/shrcntGTeoraX4xm3Tb4OwKmiLd" class="navbar__cta clickable" target="_blank" rel="noopener noreferrer">立即报名</a>
@@ -147,8 +148,10 @@ const homeLandingPageHtml = landingPageHtml
   .replaceAll('./src/assets/logo-湖北经济学院 IT 协会.jpg', partnerLogoHbue)
   .replaceAll('./src/assets/logo-武汉纺织大学千里 IT 协会.png', partnerLogoWfut)
   .replaceAll('./src/assets/logo-湖北经济学院 IT 协会.png', partnerLogoHbue)
+  .replaceAll('./src/assets/logo-湖北中医药大学 cyber 计算机协会.jpg', partnerLogoHbtcm)
   .replaceAll('./src/assets/logo-武汉大学自强网络文化工作室.jpg', partnerLogoWhu)
   .replaceAll('./src/assets/聚变开源AI社区.svg', supportLogoJubian)
+  .replaceAll('./src/assets/做点东西社区纯logo.jpg', organizerLogo)
   .replaceAll('./src/assets/主办logo.jpg', organizerLogo)
   .replaceAll('./src/assets/主办logo.png', organizerLogo)
 
