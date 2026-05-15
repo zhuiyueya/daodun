@@ -8,6 +8,7 @@ import partnerLogoHbtcm from './assets/logo-湖北中医药大学 cyber 计算�
 import partnerLogoWfut from './assets/logo-武汉纺织大学千里 IT 协会.png'
 import partnerLogoWhu from './assets/logo-武汉大学自强网络文化工作室.jpg'
 import supportLogoJubian from './assets/聚变开源AI社区.svg'
+import supportLogoMotai from './assets/模态空间.png'
 import {
   ApiError,
   approveWork,
@@ -151,6 +152,7 @@ const homeLandingPageHtml = landingPageHtml
   .replaceAll('./src/assets/logo-湖北中医药大学 cyber 计算机协会.jpg', partnerLogoHbtcm)
   .replaceAll('./src/assets/logo-武汉大学自强网络文化工作室.jpg', partnerLogoWhu)
   .replaceAll('./src/assets/聚变开源AI社区.svg', supportLogoJubian)
+  .replaceAll('./src/assets/模态空间.png', supportLogoMotai)
   .replaceAll('./src/assets/做点东西社区纯logo.jpg', organizerLogo)
   .replaceAll('./src/assets/主办logo.jpg', organizerLogo)
   .replaceAll('./src/assets/主办logo.png', organizerLogo)
