@@ -16,6 +16,7 @@ import {
   createWork,
   deleteWork,
   fetchMe,
+  fetchMyVotes,
   fetchPendingWorks,
   fetchWork,
   fetchWorks,
@@ -27,6 +28,7 @@ import {
   updateWork,
   uploadImage,
   verifyCode,
+  voteForWork,
 } from './lib/api'
 import {
   applyWechatShareData,
@@ -1528,6 +1530,8 @@ function App() {
   const [sharePosterDownloadUrl, setSharePosterDownloadUrl] = useState<string | null>(null)
   const [sharePosterError, setSharePosterError] = useState('')
   const [sharePosterWarning, setSharePosterWarning] = useState('')
+  const [votedWorkIds, setVotedWorkIds] = useState<string[]>([])
+  const [remainingVotes, setRemainingVotes] = useState(3)
   const [loading, setLoading] = useState({
     me: true,
     gallery: false,
@@ -1552,6 +1556,15 @@ function App() {
   useEffect(() => {
     void refreshMe()
   }, [])
+
+  useEffect(() => {
+    if (me) {
+      void refreshVotes()
+    } else {
+      setVotedWorkIds([])
+      setRemainingVotes(3)
+    }
+  }, [me])
 
   useEffect(() => {
     if (!isWechatClient) {
@@ -1749,6 +1762,34 @@ function App() {
     }
   }
 
+  async function refreshVotes() {
+    if (!me) return
+    try {
+      const response = await fetchMyVotes()
+      setVotedWorkIds(response.votedWorkIds)
+      setRemainingVotes(response.remainingVotes)
+    } catch {
+      // ignore - user might not be logged in
+    }
+  }
+
+  async function handleVote(workId: string) {
+    try {
+      const response = await voteForWork(workId)
+      setVotedWorkIds((prev) => [...prev, workId])
+      setRemainingVotes((prev) => prev - 1)
+      if (detailWork?.id === workId) {
+        setDetailWork({ ...detailWork, voteCount: response.voteCount })
+      }
+      setLiveWorks((prev) =>
+        prev.map((w) => (w.id === workId ? { ...w, voteCount: response.voteCount } : w)),
+      )
+      setNotice('投票成功！')
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : '投票失败')
+    }
+  }
+
   async function copyText(value: string) {
     try {
       await navigator.clipboard.writeText(value)
@@ -1921,9 +1962,12 @@ function App() {
                 {work.coverImageUrl ? <img className="work-cover" src={work.coverImageUrl} alt={`${work.title} 封面图`} /> : null}
                 <h3>{work.title}</h3>
                 <p>{getGalleryDescription(work.description)}</p>
-                <a className="card-button" href={`#/work/${work.id}`}>
-                  查看详情
-                </a>
+                <div className="work-card-footer">
+                  <span className="vote-count">{work.voteCount ?? 0} 票</span>
+                  <a className="card-button" href={`#/work/${work.id}`}>
+                    查看详情
+                  </a>
+                </div>
               </article>
             ))}
           </div>
@@ -1944,6 +1988,24 @@ function App() {
                 <img className="detail-cover" src={currentDetail.coverImageUrl} alt={`${currentDetail.title} 展示图`} />
               ) : null}
               <h1 id="detail-title">{currentDetail.title}</h1>
+              <div className="detail-vote-bar">
+                <span className="vote-count">{currentDetail.voteCount ?? 0} 票</span>
+                {me ? (
+                  isOwnDetailWork ? (
+                    <span className="vote-hint">不能投票给自己的作品</span>
+                  ) : votedWorkIds.includes(currentDetail.id) ? (
+                    <button className="ghost-button" type="button" disabled>已投票</button>
+                  ) : remainingVotes <= 0 ? (
+                    <button className="ghost-button" type="button" disabled>投票机会已用完</button>
+                  ) : (
+                    <button className="primary-button" type="button" onClick={() => void handleVote(currentDetail.id)}>
+                      投票（剩余 {remainingVotes} 次）
+                    </button>
+                  )
+                ) : (
+                  <a className="ghost-button" href={`#/auth?next=/work/${currentDetail.id}`}>登录后投票</a>
+                )}
+              </div>
               <div className="detail-share-bar">
                 <p className="meta-text">{isOwnDetailWork ? '分享给自己的朋友看看？' : '觉得作品不错？'}</p>
                 <button className="ghost-button" type="button" onClick={() => void openSharePoster(currentDetail)}>

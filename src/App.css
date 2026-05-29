@@ -633,6 +633,44 @@
   text-decoration: none;
 }
 
+.work-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  gap: 12px;
+}
+
+.vote-count {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-vote-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.08));
+}
+
+.detail-vote-bar .vote-count {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.vote-hint {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
 .detail-page {
   display: grid;
   gap: 20px;

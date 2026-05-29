@@ -19,6 +19,7 @@ export interface PublicWork {
   platformType: PlatformType
   coverImageUrl: string | null
   imageUrls: string[]
+  voteCount?: number
   createdAt: string
   status?: WorkStatus
   rejectReason?: string | null

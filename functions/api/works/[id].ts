@@ -48,6 +48,12 @@ export const onRequestGet: PagesFunction = async (context) =>
       throw new HttpError(404, '作品不存在')
     }
 
+    const voteRow = await context.env.DB.prepare(
+      'SELECT COUNT(*) AS count FROM votes WHERE work_id = ?',
+    )
+      .bind(work.id)
+      .first<{ count: number }>()
+
     return json({
       work: {
         id: work.id,
@@ -63,6 +69,7 @@ export const onRequestGet: PagesFunction = async (context) =>
         status: work.status,
         rejectReason: work.rejectReason,
         createdAt: work.createdAt,
+        voteCount: voteRow?.count ?? 0,
       },
     })
   })

@@ -242,4 +242,17 @@ export async function fetchWechatJssdkSignature(url: string) {
   })
 }
 
+export async function voteForWork(workId: string) {
+  return request<{ ok: boolean; voteCount: number }>(`/api/works/${workId}/vote`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  })
+}
+
+export async function fetchMyVotes() {
+  return request<{ votedWorkIds: string[]; remainingVotes: number }>('/api/votes/my', {
+    headers: {},
+  })
+}
+
 export { ApiError }

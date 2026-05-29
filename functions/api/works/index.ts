@@ -42,19 +42,20 @@ export const onRequestGet: PagesFunction = async (context) =>
     const rows = await context.env.DB.prepare(
       `
         SELECT
-          id,
-          track,
-          title,
-          description,
-          author_name,
-          external_url,
-          platform_type,
-          cover_image_url,
-          created_at
-        FROM works
-        WHERE status = 'approved'
-          AND (? = 'all' OR track = ?)
-        ORDER BY created_at DESC
+          w.id,
+          w.track,
+          w.title,
+          w.description,
+          w.author_name,
+          w.external_url,
+          w.platform_type,
+          w.cover_image_url,
+          w.created_at,
+          (SELECT COUNT(*) FROM votes v WHERE v.work_id = w.id) AS vote_count
+        FROM works w
+        WHERE w.status = 'approved'
+          AND (? = 'all' OR w.track = ?)
+        ORDER BY w.created_at DESC
       `,
     )
       .bind(track, track)
@@ -68,6 +69,7 @@ export const onRequestGet: PagesFunction = async (context) =>
         platform_type: string
         cover_image_url: string | null
         created_at: string
+        vote_count: number
       }>()
 
     return json({
@@ -81,6 +83,7 @@ export const onRequestGet: PagesFunction = async (context) =>
         platformType: row.platform_type,
         coverImageUrl: row.cover_image_url,
         createdAt: row.created_at,
+        voteCount: row.vote_count,
       })),
     })
   })
