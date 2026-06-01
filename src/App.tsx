@@ -598,10 +598,10 @@ function AuthPage({
   const [submitting, setSubmitting] = useState(false)
 
   async function handleRequestCode() {
-    const allowedDomains = ['163.com', 'qq.com', 'gmail.com']
+    const allowedDomains = ['163.com', 'qq.com', 'gmail.com', 'foxmail.com']
     const domain = email.split('@')[1]?.toLowerCase()
     if (!domain || !allowedDomains.includes(domain)) {
-      onNotice('仅支持 163、QQ、Gmail 邮箱登录')
+      onNotice('仅支持 163、QQ、Gmail、Foxmail 邮箱登录')
       return
     }
     try {
@@ -649,7 +649,7 @@ function AuthPage({
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             type="email"
-            placeholder="支持 163、QQ、Gmail 邮箱"
+            placeholder="支持 163、QQ、Gmail、Foxmail 邮箱"
           />
         </label>
         {sent ? (
