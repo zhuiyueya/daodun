@@ -29,6 +29,12 @@ export const onRequestPost: PagesFunction = async (context) =>
       throw new HttpError(400, '邮箱格式不正确')
     }
 
+    const allowedDomains = ['163.com', 'qq.com', 'gmail.com']
+    const domain = email.split('@')[1]
+    if (!allowedDomains.includes(domain)) {
+      throw new HttpError(400, '仅支持 163、QQ、Gmail 邮箱登录')
+    }
+
     const ip = getClientIp(context.request)
     const recentCode = await context.env.DB.prepare(
       `
