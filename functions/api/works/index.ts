@@ -55,7 +55,7 @@ export const onRequestGet: PagesFunction = async (context) =>
         FROM works w
         WHERE w.status = 'approved'
           AND (? = 'all' OR w.track = ?)
-        ORDER BY w.created_at DESC
+        ORDER BY vote_count DESC, w.created_at DESC
       `,
     )
       .bind(track, track)
